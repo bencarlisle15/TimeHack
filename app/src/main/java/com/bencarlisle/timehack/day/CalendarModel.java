@@ -45,10 +45,10 @@ abstract class CalendarModel {
                     addEventToCalendar(event);
                 }
             }
-            for (Event event : events) {
-                if (!newEvents.contains(event)) {
-                    Log.e("REMOVING EVENT ", event.toString());
-                    deleteEvent(event.getId());
+            for (int i = 0; i < events.size(); i++) {
+                if (!newEvents.contains(events.get(i))) {
+                    Log.e("REMOVING EVENT ", events.get(i).toString());
+                    deleteEvent(events.get(i).getId());
                 }
             }
         }

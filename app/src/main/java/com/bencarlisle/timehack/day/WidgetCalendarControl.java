@@ -23,10 +23,6 @@ public class WidgetCalendarControl extends CalendarModel {
     }
 
     void deleteEvent(int id) {
-        removeView(id);
-    }
-
-    void removeView(int id) {
         Log.e("EVENT FOUND", "DELETING EVENT " + id);
         synchronized (events) {
             dataControl.removeEvent(id);

@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:id="@+id/task"
+    android:onClick="deleteTask"
     android:padding="15dp">
 
     <TextView

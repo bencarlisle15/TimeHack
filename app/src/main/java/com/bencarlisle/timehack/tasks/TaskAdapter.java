@@ -17,7 +17,7 @@ class TaskAdapter extends ArrayAdapter<View> {
         return this.getItem(position);
     }
 
-    public void removeId(int position) {
+    public void removeAt(int position) {
         remove(this.getItem(position));
     }
 }

@@ -39,10 +39,10 @@ public abstract class TaskModel {
                     addTaskView(task);
                 }
             }
-            for (Task task: tasks) {
-                if (!newTasks.contains(task)) {
-                    Log.e("REMOVING TASK ", task.toString());
-                    deleteTask(task.getId());
+            for (int i = 0; i < tasks.size(); i++) {
+                if (!newTasks.contains(tasks.get(i))) {
+                    Log.e("REMOVING TASK ", String.valueOf(tasks.get(i).getId()));
+                    deleteTask(tasks.get(i).getId());
                 }
             }
         }

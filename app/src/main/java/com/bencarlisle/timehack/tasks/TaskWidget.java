@@ -32,6 +32,7 @@ public class TaskWidget extends AppWidgetProvider {
         // There may be multiple widgets active, so update all of them
         lastAppWidgetIds = appWidgetIds;
         lastAppWidgetManager = appWidgetManager;
+        Log.e("TASK", "IS SET " + (lastAppWidgetIds == null));
         for (int appWidgetId : appWidgetIds) {
             new WidgetTaskHandler(context, appWidgetManager, appWidgetId);
             Intent intent = new Intent(context, TaskViewsService.class);
@@ -58,6 +59,7 @@ public class TaskWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         Log.e("TASK", "NEW ACTION " + intent.getAction());
+        Log.e("TASK", "IS SET 2 " + (lastAppWidgetIds == null));
         Matcher matcher = Pattern.compile("deleteTask(\\d+)").matcher(Objects.requireNonNull(intent.getAction()));
         if (matcher.find()) {
             new DataControl(context).removeTask(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));

@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import com.bencarlisle.timehack.R;
 
-import java.util.Calendar;
-
 public class TasksHandler extends TaskModel {
 
     private TaskAdapter taskAdapter;
@@ -23,14 +21,17 @@ public class TasksHandler extends TaskModel {
         start();
     }
 
+
     public void deleteTask(int id) {
+        Log.e("TASK", "REMVOING IN HANDLER " + id);
         activity.runOnUiThread(() -> {
+            dataControl.removeTask(id);
             synchronized (tasks) {
-                dataControl.removeTask(id);
                 for (int i = 0; i < tasks.size(); i++) {
+                    Log.e("TASK", "FOUND " + tasks.get(i).getId());
                     if (tasks.get(i).getId() == id) {
+                        taskAdapter.removeAt(i);
                         tasks.remove(i);
-                        taskAdapter.removeId(i);
                         break;
                     }
                 }

@@ -21,6 +21,7 @@ public class Task {
         this.id = TASK_ID++;
     }
 
+
     public Task(int id, long dueDateMillis, String description, int priority, float hoursRequired, float hoursCompleted) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dueDateMillis);

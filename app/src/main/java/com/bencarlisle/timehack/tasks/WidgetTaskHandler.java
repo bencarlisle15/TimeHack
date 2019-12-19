@@ -30,7 +30,7 @@ class WidgetTaskHandler extends TaskModel {
             TaskRemoteViewsFactory.removeView(id);
             for (int i = 0; i < tasks.size(); i++) {
                 if (tasks.get(i).getId() == id) {
-                    tasks.remove(i);
+                    tasks.remove(i--);
                     break;
                 }
             }
@@ -39,13 +39,13 @@ class WidgetTaskHandler extends TaskModel {
     }
 
     public void clearViews() {
-//        synchronized (events) {
-//            for (int i = 0; i < events.size(); i++) {
-//                TimeRemoteViewsFactory.removeView(events.get(i).getId());
-//            }
-//        }
-//        updateWidget();
-//        Log.e("EVENT", "CLEARED");
+        synchronized (tasks) {
+            for (int i = 0; i < tasks.size(); i++) {
+                TaskRemoteViewsFactory.removeView(tasks.get(i).getId());
+            }
+        }
+        updateWidget();
+        Log.e("TASK", "CLEARED");
     }
 
     public void addTaskView(Task task) {
