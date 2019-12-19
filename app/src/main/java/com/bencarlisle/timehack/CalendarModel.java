@@ -1,6 +1,5 @@
 package com.bencarlisle.timehack;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
@@ -9,15 +8,16 @@ import android.util.TypedValue;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-
 abstract class CalendarModel {
 
-    ArrayList<Event> events = new ArrayList<>();
+    final ArrayList<Event> events = new ArrayList<>();
     Context context;
     DataControl dataControl;
 
     abstract void clearViews();
+
     abstract void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event);
+
     abstract void deleteEvent(int id);
 
     CalendarModel(Context context) {
@@ -33,18 +33,21 @@ abstract class CalendarModel {
     }
 
     void poll() {
-        Log.e("BEEP", "POLLING");
-        ArrayList<Event> newEvents = dataControl.getEvents();
-        for (Event event: newEvents) {
-            Log.e("EVENT FOUND", event.toString());
-            if (!events.contains(event)) {
-                events.add(event);
-                addEventToCalendar(event);
+        synchronized (events) {
+            ArrayList<Event> newEvents = dataControl.getEvents();
+            Log.e("EVENT", "FOUND " + newEvents.size() + " events");
+            for (Event event : newEvents) {
+                if (!events.contains(event)) {
+                    Log.e("EVENT FOUND", event.toString());
+                    events.add(event);
+                    addEventToCalendar(event);
+                }
             }
-        }
-        for (Event event: events) {
-            if (!newEvents.contains(event)) {
-                deleteEvent(event.getId());
+            for (Event event : events) {
+                if (!newEvents.contains(event)) {
+                    Log.e("REMOVING EVENT ", event.toString());
+                    deleteEvent(event.getId());
+                }
             }
         }
     }
@@ -69,10 +72,11 @@ abstract class CalendarModel {
     private void initCalendar() {
         //will be deleted
 //        dataControl.clear();
-        events = dataControl.getEvents();
-        for (Event event: events) {
-            Log.e("EVENT", event.toString());
-            addEventToCalendar(event);
+        synchronized (events) {
+            for (Event event : events) {
+                Log.e("EVENT", event.toString());
+                addEvent(event, false);
+            }
         }
     }
 
@@ -84,14 +88,14 @@ abstract class CalendarModel {
 
     float convertDPtoPixels(float dp) {
         Resources r = context.getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,dp, r.getDisplayMetrics());
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
     int getWindowWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
-    Event addEvent(final Event event, boolean force) {
+    Event addEvent(final Event event, @SuppressWarnings("SameParameterValue") boolean force) {
 //        if (!force) {
 //            for (Event e : events) {
 //                if (e.isOverlapping(event)) {
@@ -124,7 +128,7 @@ abstract class CalendarModel {
         int newDescriptionTextSize = 10;
         if (numberOfHours >= 0.5) {
             newDescriptionTextSize = 15;
-        } else if (numberOfHours >= 0.25){
+        } else if (numberOfHours >= 0.25) {
             newDescriptionTextSize = 12;
         }
         addEventViewToCalendar(height, width, spacerHeight, newDescriptionTextSize, event);

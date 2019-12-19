@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 
 import java.io.Serializable;
 
-public class Adapter implements ListAdapter, Serializable {
+class Adapter implements ListAdapter, Serializable {
 
     private RelativeLayout calendar;
 

@@ -1,9 +1,35 @@
 <component name="ProjectDictionaryState">
   <dictionary name="benca">
     <words>
+      <w>activitychooserview</w>
       <w>autohide</w>
+      <w>benca</w>
       <w>bencarlisle</w>
+      <w>calendardayview</w>
+      <w>cardview</w>
+      <w>dayview</w>
+      <w>dropdownitem</w>
+      <w>edittext</w>
+      <w>framgia</w>
+      <w>hardkey</w>
+      <w>listview</w>
+      <w>longpressed</w>
+      <w>maxnum</w>
+      <w>mtrl</w>
+      <w>mult</w>
+      <w>multichoice</w>
+      <w>picasa</w>
+      <w>ratingbar</w>
+      <w>remoteviews</w>
       <w>resetter</w>
+      <w>searchview</w>
+      <w>seekbar</w>
+      <w>selectall</w>
+      <w>shaders</w>
+      <w>shareactionprovider</w>
+      <w>singlechoice</w>
+      <w>submenuarrow</w>
+      <w>textfield</w>
       <w>timehack</w>
     </words>
   </dictionary>

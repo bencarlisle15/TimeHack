@@ -1,6 +1,6 @@
 package com.bencarlisle.timehack;
 
-public class Merger {
+class Merger {
 
     private CalendarModel calendarModel;
 

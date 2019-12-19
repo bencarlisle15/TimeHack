@@ -23,19 +23,25 @@ class WidgetCalendarControl extends CalendarModel {
     }
 
     void removeView(int id) {
-        for (int i = 0; i < events.size(); i++) {
-            if (events.get(i).getId() == id) {
-                dataControl.removeEvent(events.get(i));
-                TimeRemoteViewsFactory.removeView(id);
-                events.remove(i);
-                break;
+        Log.e("EVENT FOUND", "DELETING EVENT " + id);
+        synchronized (events) {
+            for (int i = 0; i < events.size(); i++) {
+                if (events.get(i).getId() == id) {
+                    dataControl.removeEvent(events.get(i));
+                    TimeRemoteViewsFactory.removeView(id);
+                    events.remove(i);
+                    break;
+                }
             }
         }
+        updateWidget();
     }
 
     public void clearViews() {
-        for (int i = 0; i < events.size(); i++) {
-            TimeRemoteViewsFactory.removeView(events.get(i).getId());
+        synchronized (events) {
+            for (int i = 0; i < events.size(); i++) {
+                TimeRemoteViewsFactory.removeView(events.get(i).getId());
+            }
         }
         updateWidget();
         Log.e("EVENT", "CLEARED");

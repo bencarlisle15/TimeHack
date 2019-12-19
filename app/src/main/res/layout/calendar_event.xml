@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:text=""></TextView>
+        android:text="" />
 
     <TextView
         android:id="@+id/event_text"
@@ -17,8 +17,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/full_border"
         android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:paddingTop="15dp"
         android:onClick="deleteEvent"
         android:textColor="@android:color/white"
-        android:translationX="70dp"></TextView>
+        android:translationX="70dp" />
 </LinearLayout>

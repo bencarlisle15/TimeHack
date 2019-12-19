@@ -7,7 +7,6 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/times"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
@@ -21,7 +20,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_0"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -38,7 +36,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_1"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -55,7 +52,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_2"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -72,7 +68,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_3"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -89,7 +84,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_4"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -106,7 +100,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_5"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -123,7 +116,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_6"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -140,7 +132,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_7"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -157,7 +148,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_8"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -174,7 +164,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_9"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -191,7 +180,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_10"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -208,7 +196,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_11"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -225,7 +212,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_12"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -242,7 +228,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_13"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -259,7 +244,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_14"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -276,7 +260,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_15"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -293,7 +276,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_16"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -310,7 +292,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_17"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -327,7 +308,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_18"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -344,7 +324,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_19"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -361,7 +340,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_20"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -378,7 +356,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_21"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -395,7 +372,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_22"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"
@@ -412,7 +388,6 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/time_23"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:background="@drawable/border_right"

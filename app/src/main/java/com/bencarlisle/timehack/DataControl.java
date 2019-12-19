@@ -8,7 +8,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-public class DataControl extends SQLiteOpenHelper  {
+
+class DataControl extends SQLiteOpenHelper  {
     private SQLiteDatabase db;
 
     DataControl(Context context) {
@@ -30,7 +31,6 @@ public class DataControl extends SQLiteOpenHelper  {
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
                 long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
-                Log.e("EVENT", "id " + id + " startTime " + startTime + " endTime" + endTime);
                 events.add(new Event(id, description, startTime, endTime));
                 cursor.moveToNext();
             }

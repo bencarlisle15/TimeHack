@@ -2,7 +2,7 @@ package com.bencarlisle.timehack;
 
 import java.util.Calendar;
 
-public class Resetter {
+class Resetter {
 
     private CalendarModel calendarModel;
 

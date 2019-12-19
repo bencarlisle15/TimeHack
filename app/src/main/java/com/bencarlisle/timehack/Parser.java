@@ -43,6 +43,10 @@ class Parser {
         Calendar endTime = getTime(words[4], words[5]);
         if (words[0].equals("from") && startTime != null && words[3].equals("to") && endTime != null) {
             String description = String.join(" ", Arrays.copyOfRange(words, 6, words.length));
+            if (description.length() == 0) {
+                Log.e("PARSER", "No event listed");
+                return null;
+            }
             return new Event(startTime, endTime, description);
         } else {
             Log.e("PARSER", "no match");

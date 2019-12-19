@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">TimeHack</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
     <string name="t0">0</string>
     <string name="t1">1</string>
     <string name="t2">2</string>

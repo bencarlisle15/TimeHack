@@ -37,7 +37,7 @@ public class DayWidget extends AppWidgetProvider {
         }
     }
 
-    protected PendingIntent getPendingSelfIntent(Context context) {
+    private PendingIntent getPendingSelfIntent(Context context) {
         Intent activityIntent = new Intent(context, VoiceRecognitionActivity.class);
         return PendingIntent.getActivity(context, 0, activityIntent, 0);
     }

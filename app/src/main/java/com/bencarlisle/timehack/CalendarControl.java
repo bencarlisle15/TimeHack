@@ -7,7 +7,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 class CalendarControl extends CalendarModel {
-    private transient Adapter adapter;
+    private Adapter adapter;
     private Activity activity;
 
     CalendarControl(Activity activity) {
@@ -29,14 +29,18 @@ class CalendarControl extends CalendarModel {
     }
 
     void deleteEvent(int id) {
-        for (int i = 0; i < events.size(); i++) {
-            if (events.get(i).getId() == id) {
-                dataControl.removeEvent(events.get(i));
-                adapter.removeView(i);
-                events.remove(i);
-                break;
+        activity.runOnUiThread(() -> {
+            synchronized (events) {
+                for (int i = 0; i < events.size(); i++) {
+                    if (events.get(i).getId() == id) {
+                        dataControl.removeEvent(events.get(i));
+                        adapter.removeView(i);
+                        events.remove(i);
+                        break;
+                    }
+                }
             }
-        }
+        });
     }
 
     void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {

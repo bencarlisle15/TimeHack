@@ -1,13 +1,10 @@
 package com.bencarlisle.timehack;
 
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Calendar;
 
-public class Event {
+class Event {
 
     private static int EVENT_ID = 0;
     private Calendar startTime, endTime;
@@ -78,7 +75,7 @@ public class Event {
     }
 
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof Event)) {
+        if (!(o instanceof Event)) {
             return false;
         }
         return o.hashCode() == hashCode();
