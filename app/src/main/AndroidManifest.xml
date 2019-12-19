@@ -5,14 +5,23 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning"
-        android:fullBackupContent="@xml/backup_descriptor">
-        <receiver android:name=".DayWidget">
+        tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".tasks.TaskWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/task_widget_info" />
+        </receiver>
+        <receiver android:name=".day.DayWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -21,21 +30,27 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/day_widget_info" />
         </receiver>
-        <receiver android:name=".Resetter" />
-        <receiver android:name=".Merger" />
-        <service android:name=".TimeViewsService"
-        android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <activity android:name=".MainActivity">
+
+        <service
+            android:name=".day.TimeViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".tasks.TaskViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".day.DayActivity" />
+        <activity android:name=".tasks.TasksActivity" />
         <activity
-            android:name=".VoiceRecognitionActivity"
-            android:label="speech" >
-        </activity>
+            android:name=".day.VoiceRecognitionActivity"
+            android:label="speech" />
     </application>
 
 </manifest>

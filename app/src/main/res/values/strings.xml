@@ -25,4 +25,8 @@
     <string name="t22">22</string>
     <string name="t23">23</string>
     <string name="start">Start</string>
+    <string name="tasks">Tasks</string>
+    <string name="day_calendar">Day Calendar</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

@@ -1,11 +1,13 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.tasks;
+
+import android.util.Log;
 
 class Merger {
 
-    private CalendarModel calendarModel;
+    private TaskModel taskModel;
 
-    public Merger(CalendarModel calendarModel) {
-        this.calendarModel = calendarModel;
+    public Merger(TaskModel taskModel) {
+        this.taskModel = taskModel;
     }
 
     public void start() {
@@ -19,7 +21,7 @@ class Merger {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            calendarModel.poll();
+            taskModel.poll();
         }
     }
 }

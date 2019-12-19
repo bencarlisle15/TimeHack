@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -8,13 +8,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.main.Event;
+import com.bencarlisle.timehack.main.GeneralActivity;
+import com.bencarlisle.timehack.main.Parser;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
-
+public class DayActivity extends GeneralActivity {
     private final int REQ_CODE_SPEECH_INPUT = 100;
     private transient CalendarControl calendar;
 
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day);
         calendar = new CalendarControl(this);
-
     }
 
     @SuppressWarnings("WeakerAccess")

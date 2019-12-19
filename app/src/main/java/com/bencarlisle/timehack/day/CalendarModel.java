@@ -1,9 +1,12 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 import android.util.TypedValue;
+
+import com.bencarlisle.timehack.main.DataControl;
+import com.bencarlisle.timehack.main.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +38,6 @@ abstract class CalendarModel {
     void poll() {
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
-            Log.e("EVENT", "FOUND " + newEvents.size() + " events");
             for (Event event : newEvents) {
                 if (!events.contains(event)) {
                     Log.e("EVENT FOUND", event.toString());
@@ -82,7 +84,7 @@ abstract class CalendarModel {
 
     void clear() {
         clearViews();
-        dataControl.clear();
+        dataControl.clearEvents();
         events.clear();
     }
 

@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import java.util.Calendar;
 

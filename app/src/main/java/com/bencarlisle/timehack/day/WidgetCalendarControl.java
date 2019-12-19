@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-class WidgetCalendarControl extends CalendarModel {
+import com.bencarlisle.timehack.main.Event;
+import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.tasks.TaskWidget;
+
+public class WidgetCalendarControl extends CalendarModel {
     private AppWidgetManager appWidgetManager;
     private int appWidgetId;
 
@@ -25,10 +29,10 @@ class WidgetCalendarControl extends CalendarModel {
     void removeView(int id) {
         Log.e("EVENT FOUND", "DELETING EVENT " + id);
         synchronized (events) {
+            dataControl.removeEvent(id);
+            TimeRemoteViewsFactory.removeView(id);
             for (int i = 0; i < events.size(); i++) {
                 if (events.get(i).getId() == id) {
-                    dataControl.removeEvent(events.get(i));
-                    TimeRemoteViewsFactory.removeView(id);
                     events.remove(i);
                     break;
                 }

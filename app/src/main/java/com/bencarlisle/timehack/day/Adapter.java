@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 
+import com.bencarlisle.timehack.R;
+
 import java.io.Serializable;
 
-class Adapter implements ListAdapter, Serializable {
+class Adapter implements ListAdapter {
 
     private RelativeLayout calendar;
 

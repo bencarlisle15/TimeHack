@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import com.bencarlisle.timehack.R;
 
 public class TimeViewsService extends RemoteViewsService {
 

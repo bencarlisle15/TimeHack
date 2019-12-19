@@ -1,24 +1,24 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.main;
 
 import androidx.annotation.NonNull;
 
 import java.util.Calendar;
 
-class Event {
+public class Event {
 
     private static int EVENT_ID = 0;
     private Calendar startTime, endTime;
     private String description;
     private int id;
 
-    Event(Calendar startTime, Calendar endTime, String description) {
+    public Event(Calendar startTime, Calendar endTime, String description) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.description = toSentenceCase(description);
         this.id = EVENT_ID++;
     }
 
-    Event(int id, String description, long startTime, long endTime) {
+    public Event(int id, String description, long startTime, long endTime) {
         this.id = id;
         this.description = description;
         Calendar calendar = Calendar.getInstance();
@@ -29,19 +29,19 @@ class Event {
         this.endTime = calendar;
     }
 
-    static void setEventId(int eventId) {
+    public static void setEventId(int eventId) {
         EVENT_ID = eventId;
     }
 
-    int getId() {
+    public int getId() {
         return this.id;
     }
 
-    Calendar getStartTime() {
+    public Calendar getStartTime() {
         return startTime;
     }
 
-    Calendar getEndTime() {
+    public Calendar getEndTime() {
         return endTime;
     }
 
@@ -49,7 +49,7 @@ class Event {
         return startTime.compareTo(time) < 0 && time.compareTo(endTime) > 0;
     }
 
-    boolean isOverlapping(Event event) {
+    public boolean isOverlapping(Event event) {
         return isBetween(event.startTime) || isBetween(event.endTime);
     }
 
@@ -66,7 +66,7 @@ class Event {
         return time.get(Calendar.HOUR) + ":" + time.get(Calendar.MINUTE) + " " + (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
     }
 
-    String getDescription() {
+    public String getDescription() {
         return description;
     }
 

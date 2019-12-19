@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.main.DataControl;
+
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +20,6 @@ public class DayWidget extends AppWidgetProvider {
 
     private static int[] lastAppWidgetIds;
     private static AppWidgetManager lastAppWidgetManager;
-    private static WidgetCalendarControl lastCalendarControl;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -25,12 +27,11 @@ public class DayWidget extends AppWidgetProvider {
         lastAppWidgetIds = appWidgetIds;
         lastAppWidgetManager = appWidgetManager;
         for (int appWidgetId : appWidgetIds) {
-            lastCalendarControl = new WidgetCalendarControl(context, appWidgetManager, appWidgetId);
-            VoiceRecognitionActivity.setCalendarControl(lastCalendarControl);
+            new WidgetCalendarControl(context, appWidgetManager, appWidgetId);
             Intent intent = new Intent(context, TimeViewsService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.activity_day);
+            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.main_day_layout);
             rv.setRemoteAdapter(R.id.scroll, intent);
             rv.setOnClickPendingIntent(R.id.start_button, getPendingSelfIntent(context));
             appWidgetManager.updateAppWidget(appWidgetId, rv);
@@ -51,7 +52,7 @@ public class DayWidget extends AppWidgetProvider {
         Log.e("EVENT", "NEW ACTION " + intent.getAction());
         Matcher matcher = Pattern.compile("deleteEvent(\\d+)").matcher(Objects.requireNonNull(intent.getAction()));
         if (matcher.find()) {
-            lastCalendarControl.removeView(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));
+            new DataControl(context).removeEvent(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));
             for (int appWidgetId : lastAppWidgetIds) {
                 lastAppWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.scroll);
             }

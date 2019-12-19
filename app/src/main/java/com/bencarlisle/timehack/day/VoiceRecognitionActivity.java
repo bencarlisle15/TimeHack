@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.bencarlisle.timehack.main.Event;
+import com.bencarlisle.timehack.main.Parser;
 
 import java.util.ArrayList;
 
@@ -19,7 +22,7 @@ public class VoiceRecognitionActivity extends Activity {
         sendRecognizeIntent();
     }
 
-    static void setCalendarControl(WidgetCalendarControl calendarControl) {
+    public static void setCalendarControl(WidgetCalendarControl calendarControl) {
         lastCalendarControl = calendarControl;
     }
 

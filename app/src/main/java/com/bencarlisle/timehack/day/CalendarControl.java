@@ -1,10 +1,13 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.day;
 
 import android.app.Activity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bencarlisle.timehack.main.Event;
+import com.bencarlisle.timehack.R;
 
 class CalendarControl extends CalendarModel {
     private Adapter adapter;
@@ -31,9 +34,9 @@ class CalendarControl extends CalendarModel {
     void deleteEvent(int id) {
         activity.runOnUiThread(() -> {
             synchronized (events) {
+                dataControl.removeEvent(id);
                 for (int i = 0; i < events.size(); i++) {
                     if (events.get(i).getId() == id) {
-                        dataControl.removeEvent(events.get(i));
                         adapter.removeView(i);
                         events.remove(i);
                         break;

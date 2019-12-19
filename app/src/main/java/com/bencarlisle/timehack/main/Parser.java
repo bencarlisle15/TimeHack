@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack;
+package com.bencarlisle.timehack.main;
 
 import android.util.Log;
 
@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Parser {
+public class Parser {
 
-    static Event parseResult(String str) {
+    public static Event parseResult(String str) {
         Event event = parseWithoutFrom(str);
         if (event != null) {
             return event;
