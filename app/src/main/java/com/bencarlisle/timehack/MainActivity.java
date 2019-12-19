@@ -1,7 +1,5 @@
 package com.bencarlisle.timehack;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,19 +8,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    private CalendarControl calendar;
+    private transient CalendarControl calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_day);
         calendar = new CalendarControl(this);
+
     }
 
     public void start(View view) {
@@ -35,12 +36,16 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
             String notSupported = "Not supported";
-            Toast.makeText(getApplicationContext(), notSupported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, notSupported, Toast.LENGTH_SHORT).show();
         }
     }
 
+    public void deleteEvent(View view) {
+        calendar.deleteEvent(view);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQ_CODE_SPEECH_INPUT) {
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         }
                     }
-                    Toast.makeText(getApplicationContext(), status, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
                     start(null);
                 } else {
                     Log.e("FINISHED", "no speech");

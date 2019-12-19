@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="hour" type="String"/>
+    </data>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_bottom">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_right"
+            android:id="@+id/time_text"
+            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
+            android:paddingBottom="50dp"
+            android:text="@{hour}" />
+    </LinearLayout>
+</layout>

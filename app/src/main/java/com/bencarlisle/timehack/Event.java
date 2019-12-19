@@ -1,57 +1,51 @@
 package com.bencarlisle.timehack;
 
-import androidx.annotation.NonNull;
-import com.framgia.library.calendardayview.data.IEvent;
-import com.framgia.library.calendardayview.data.IPopup;
+import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
 import java.util.Calendar;
 
-public class Event implements IEvent, IPopup {
+public class Event {
 
+    private static int EVENT_ID = 0;
     private Calendar startTime, endTime;
     private String description;
+    private int id;
 
     Event(Calendar startTime, Calendar endTime, String description) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.description = toSentenceCase(description);
+        this.id = EVENT_ID++;
     }
 
-    public Calendar getStartTime() {
+    Event(int id, String description, long startTime, long endTime) {
+        this.id = id;
+        this.description = description;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startTime);
+        this.startTime = calendar;
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(endTime);
+        this.endTime = calendar;
+    }
+
+    static void setEventId(int eventId) {
+        EVENT_ID = eventId;
+    }
+
+    int getId() {
+        return this.id;
+    }
+
+    Calendar getStartTime() {
         return startTime;
     }
 
-    public Calendar getEndTime() {
+    Calendar getEndTime() {
         return endTime;
-    }
-
-    @Override
-    public String getTitle() {
-        return description;
-    }
-
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
-    public String getQuote() {
-        return "";
-    }
-
-    @Override
-    public String getImageStart() {
-        return "";
-    }
-
-    @Override
-    public String getImageEnd() {
-        return "";
-    }
-
-    @Override
-    public Boolean isAutohide() {
-        return false;
     }
 
     private boolean isBetween(Calendar time) {
@@ -75,13 +69,18 @@ public class Event implements IEvent, IPopup {
         return time.get(Calendar.HOUR) + ":" + time.get(Calendar.MINUTE) + " " + (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
     }
 
-    @Override
-    public String getName() {
+    String getDescription() {
         return description;
     }
 
-    @Override
-    public int getColor() {
-        return 0;
+    public int hashCode() {
+        return id;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof Event)) {
+            return false;
+        }
+        return o.hashCode() == hashCode();
     }
 }
