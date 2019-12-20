@@ -3,7 +3,6 @@ package com.bencarlisle.timehack.main;
 import android.util.Log;
 
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -11,84 +10,29 @@ import java.util.regex.Pattern;
 
 class Parser {
 
-    public static Event parseEventResult(String str) {
-        Event event = parseEventWithoutFrom(str);
-        if (event != null) {
-            return event;
+    static Event parseEventResult(String result) {
+        Matcher matcher = Pattern.compile("^(from)? (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.*)$").matcher(result);
+        if (!matcher.find()) {
+            return null;
         }
-        return parseEventWithFrom(str);
+        int startHour = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
+        int startMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
+        String startAm = matcher.group(5);
+        int endHour = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
+        int endMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(8)));
+        String endAm = matcher.group(9);
+        String description = matcher.group(10);
+
+        Calendar startTime = getTime(startHour, startMinute, startAm);
+        Calendar endTime = getTime(endHour, endMinute, endAm);
+        if (startTime == null || endTime == null) {
+            return null;
+        }
+        return new Event(startTime, endTime, description);
     }
 
-    private static Event parseEventWithoutFrom(String str) {
-        String[] words = str.split(" ");
-        if (words.length < 6) {
-            return null;
-        }
-        Calendar startTime = getTime(words[0], words[1]);
-        Calendar endTime = getTime(words[3], words[4]);
-        if (startTime != null && words[2].equals("to") && endTime != null) {
-            String description = String.join(" ", Arrays.copyOfRange(words, 5, words.length));
-            return new Event(startTime, endTime, description);
-        } else {
-            Log.e("PARSER", "no match");
-            return null;
-        }
-    }
-
-    private static Event parseEventWithFrom(String str) {
-        String[] words = str.split(" ");
-        if (words.length < 6) {
-            return null;
-        }
-        Calendar startTime = getTime(words[1], words[2]);
-        Calendar endTime = getTime(words[4], words[5]);
-        if (words[0].equals("from") && startTime != null && words[3].equals("to") && endTime != null) {
-            String description = String.join(" ", Arrays.copyOfRange(words, 6, words.length));
-            if (description.length() == 0) {
-                Log.e("PARSER", "No event listed");
-                return null;
-            }
-            return new Event(startTime, endTime, description);
-        } else {
-            Log.e("PARSER", "no match");
-            return null;
-        }
-    }
-
-    private static Calendar getTime(String word1, String word2) {
-        Pattern patternMinute = Pattern.compile("^(\\d{1,2}):(\\d{2})$");
-        Pattern patternHour = Pattern.compile("^(\\d{1,2})$");
-        Matcher matcherMinute = patternMinute.matcher(word1);
-        Matcher matcherHour = patternHour.matcher(word1);
-        Matcher matcher = matcherHour;
-        int minute = 0;
-        if (matcherMinute.find()) {
-            matcher = matcherMinute;
-            minute = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
-        } else if (!matcherHour.find()) {
-            return null;
-        }
-        int hour = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
-        if (hour <= 0 || hour > 12 || minute < 0 || minute > 60) {
-            Log.e("EVENT", "ERR");
-            return null;
-        }
-        if (hour == 12) {
-            hour -= 12;
-        }
-        if (word2.equalsIgnoreCase("p.m.")) {
-            hour += 12;
-        } else if (!word2.equalsIgnoreCase("a.m.")) {
-            return null;
-        }
-        Calendar time = Calendar.getInstance();
-        time.set(Calendar.HOUR_OF_DAY, hour);
-        time.set(Calendar.MINUTE, minute);
-        return time;
-    }
-
-    public static Task parseTaskResult(String str) {
-        Matcher matcher = Pattern.compile("add (.+) (due|to|do) (.*) (\\d+).. with (\\d+) hours and priority (\\d)").matcher(str);
+    static Task parseTaskResult(String str) {
+        Matcher matcher = Pattern.compile("^add (.+) (due|to|do) ([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] with (\\d{1,2}) hours and priority (\\d)$").matcher(str);
         if (!matcher.find()) {
             return null;
         }
@@ -99,7 +43,7 @@ class Parser {
         int hoursRequired = Integer.parseInt(Objects.requireNonNull(matcher.group(5)));
         int priority = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
 
-        Calendar dueDate = getDueDate(month, day);
+        Calendar dueDate = getDate(month, day);
 
         if (dueDate == null || hoursRequired < 0 || priority < 0) {
             return null;
@@ -138,7 +82,7 @@ class Parser {
         return -1;
     }
 
-    private static Calendar getDueDate(int month, int day) {
+    private static Calendar getDate(int month, int day) {
         if (month < 0 ) {
             return null;
         }
@@ -149,12 +93,75 @@ class Parser {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.DATE, day);
-        Log.e("PARSER",month + " " + day);
         return calendar;
     }
 
-    public static Returnable parseReturnableResult(String result) {
-        //todo
-        return null;
+    static Returnable parseReturnableResult(String result) {
+        Matcher matcher = Pattern.compile("^([a-zA-Z ]*) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.*)$").matcher(result);
+        if (!matcher.find()) {
+            return null;
+        }
+        String daysString = matcher.group(1);
+        int startHour = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
+        int startMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
+        String startAm = matcher.group(5);
+        int endHour = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
+        int endMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(8)));
+        String endAm = matcher.group(9);
+        String description = matcher.group(10);
+
+        boolean[] days = getDays(Objects.requireNonNull(daysString));
+        Calendar startTime = getTime(startHour, startMinute, startAm);
+        Calendar endTime = getTime(endHour, endMinute, endAm);
+        if (startTime == null || endTime == null || days == null) {
+            return null;
+        }
+        Event event = new Event(startTime, endTime, description);
+        return new Returnable(days, event);
+    }
+
+    private static boolean[] getDays(String daysString) {
+        String[] daysList = daysString.split(" ");
+        boolean[] days = new boolean[7];
+        if (daysList.length == 0) {
+            return null;
+        }
+        for (String day: daysList) {
+            int index = -1;
+            if (day.equalsIgnoreCase("sunday")) {
+                index = 0;
+            } else if (day.equalsIgnoreCase("monday")) {
+                index = 1;
+            } else if (day.equalsIgnoreCase("tuesday")) {
+                index = 2;
+            } else if (day.equalsIgnoreCase("wednesday")) {
+                index = 3;
+            } else if (day.equalsIgnoreCase("thursday")) {
+                index = 4;
+            } else if (day.equalsIgnoreCase("friday")) {
+                index = 5;
+            } else if (day.equalsIgnoreCase("saturday")) {
+                index = 6;
+            }
+            if (index == -1) {
+                return null;
+            }
+            days[index] = true;
+        }
+        return days;
+    }
+
+    private static Calendar getTime(int hour, int minute, String am) {
+        if (hour <= 0 || minute < 0 || hour > 12 || minute >= 60) {
+            return null;
+        }
+        if (am.equalsIgnoreCase("pm")) {
+            hour += 12;
+            hour %= 24;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        return calendar;
     }
 }
