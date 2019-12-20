@@ -18,14 +18,9 @@ import java.util.regex.Pattern;
 
 public class DayWidget extends AppWidgetProvider {
 
-    private static int[] lastAppWidgetIds;
-    private static AppWidgetManager lastAppWidgetManager;
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
-        lastAppWidgetIds = appWidgetIds;
-        lastAppWidgetManager = appWidgetManager;
         for (int appWidgetId : appWidgetIds) {
             new WidgetCalendarControl(context, appWidgetManager, appWidgetId);
             Intent intent = new Intent(context, TimeViewsService.class);
@@ -53,9 +48,6 @@ public class DayWidget extends AppWidgetProvider {
         Matcher matcher = Pattern.compile("deleteEvent(\\d+)").matcher(Objects.requireNonNull(intent.getAction()));
         if (matcher.find()) {
             new DataControl(context).removeEvent(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));
-            for (int appWidgetId : lastAppWidgetIds) {
-                lastAppWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.scroll);
-            }
         }
     }
 

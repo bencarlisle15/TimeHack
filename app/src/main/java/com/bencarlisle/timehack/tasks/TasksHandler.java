@@ -1,7 +1,6 @@
 package com.bencarlisle.timehack.tasks;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,7 +12,7 @@ public class TasksHandler extends TaskModel {
     private TaskAdapter taskAdapter;
     private Activity activity;
 
-    public TasksHandler(Activity activity) {
+    TasksHandler(Activity activity) {
         super(activity);
         this.activity = activity;
         taskAdapter = new TaskAdapter(activity, R.id.tasks);
@@ -23,12 +22,10 @@ public class TasksHandler extends TaskModel {
 
 
     public void deleteTask(int id) {
-        Log.e("TASK", "REMVOING IN HANDLER " + id);
         activity.runOnUiThread(() -> {
             dataControl.removeTask(id);
             synchronized (tasks) {
                 for (int i = 0; i < tasks.size(); i++) {
-                    Log.e("TASK", "FOUND " + tasks.get(i).getId());
                     if (tasks.get(i).getId() == id) {
                         taskAdapter.removeAt(i);
                         tasks.remove(i);

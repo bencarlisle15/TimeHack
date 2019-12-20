@@ -24,13 +24,12 @@ class WidgetTaskHandler extends TaskModel {
     }
 
     public void deleteTask(int id) {
-        Log.e("TASK FOUND", "DELETING TASK " + id);
         synchronized (tasks) {
             dataControl.removeTask(id);
             TaskRemoteViewsFactory.removeView(id);
             for (int i = 0; i < tasks.size(); i++) {
                 if (tasks.get(i).getId() == id) {
-                    tasks.remove(i--);
+                    tasks.remove(i);
                     break;
                 }
             }
@@ -49,7 +48,6 @@ class WidgetTaskHandler extends TaskModel {
     }
 
     public void addTaskView(Task task) {
-        Log.e("TASK", "NEW TASK ADDED");
         RemoteViews newTask = new RemoteViews(context.getPackageName(), R.layout.task);
         newTask.setTextViewText(R.id.description, task.getDescription());
         newTask.setTextViewText(R.id.due_date, convertToDate(task.getDueDate()));

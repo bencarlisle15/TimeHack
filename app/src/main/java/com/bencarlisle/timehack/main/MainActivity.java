@@ -15,4 +15,9 @@ public class MainActivity extends GeneralActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
+    @Override
+    protected String checkAndParseResult(String result) {
+        return null;
+    }
 }

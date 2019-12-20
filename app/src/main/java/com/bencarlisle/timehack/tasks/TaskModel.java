@@ -1,8 +1,6 @@
 package com.bencarlisle.timehack.tasks;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.bencarlisle.timehack.main.DataControl;
@@ -18,7 +16,7 @@ public abstract class TaskModel {
     public abstract void addTaskView(Task task);
     public abstract void deleteTask(int id);
 
-    public TaskModel(Context context) {
+    TaskModel(Context context) {
         dataControl = new DataControl(context);
 //        dataControl.clearTasks();
         new Merger(this).start();
@@ -26,7 +24,7 @@ public abstract class TaskModel {
 
     public void start() {
         initTasks();
-        createTempEvent();
+//        createTempEvent();
     }
 
     void poll() {
@@ -64,13 +62,12 @@ public abstract class TaskModel {
     private void initTasks() {
         synchronized (tasks) {
             for (Task task: tasks) {
-                Log.e("TASK", task.toString());
                 addTask(task);
             }
         }
     }
 
-    public void addTask(Task task) {
+    void addTask(Task task) {
         dataControl.addTask(task);
         tasks.add(task);
         addTaskView(task);

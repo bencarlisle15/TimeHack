@@ -2,6 +2,9 @@ package com.bencarlisle.timehack.main;
 
 import android.util.Log;
 
+import com.bencarlisle.timehack.tasks.Task;
+
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
@@ -10,15 +13,15 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    public static Event parseResult(String str) {
-        Event event = parseWithoutFrom(str);
+    public static Event parseEventResult(String str) {
+        Event event = parseEventWithoutFrom(str);
         if (event != null) {
             return event;
         }
-        return parseWithFrom(str);
+        return parseEventWithFrom(str);
     }
 
-    private static Event parseWithoutFrom(String str) {
+    private static Event parseEventWithoutFrom(String str) {
         String[] words = str.split(" ");
         if (words.length < 6) {
             return null;
@@ -34,7 +37,7 @@ public class Parser {
         }
     }
 
-    private static Event parseWithFrom(String str) {
+    private static Event parseEventWithFrom(String str) {
         String[] words = str.split(" ");
         if (words.length < 6) {
             return null;
@@ -84,5 +87,71 @@ public class Parser {
         time.set(Calendar.HOUR_OF_DAY, hour);
         time.set(Calendar.MINUTE, minute);
         return time;
+    }
+
+    public static Task parseTaskResult(String str) {
+        Matcher matcher = Pattern.compile("add (.+) (due|to|do) (.*) (\\d+).. with (\\d+) hours and priority (\\d)").matcher(str);
+        if (!matcher.find()) {
+            return null;
+        }
+        
+        String description = matcher.group(1);
+        int month = getMonth(matcher.group(3));
+        int day = Integer.parseInt(matcher.group(4));
+        int hoursRequired = Integer.parseInt(matcher.group(5));
+        int priority = Integer.parseInt(matcher.group(6));
+
+        Calendar dueDate = getDueDate(month, day);
+
+        if (dueDate == null || hoursRequired < 0 || priority < 0) {
+            return null;
+        }
+        Log.e("PARSER", new Task(dueDate , description, priority, hoursRequired, 0).toString() );
+        return new Task(dueDate , description, priority, hoursRequired, 0);
+
+    }
+
+    private static int getMonth(String month) {
+        if (month.equalsIgnoreCase("january")) {
+            return 0;
+        } else if (month.equalsIgnoreCase("february")) {
+            return 1;
+        } else if (month.equalsIgnoreCase("march")) {
+            return 2;
+        } else if (month.equalsIgnoreCase("april")) {
+            return 3;
+        } else if (month.equalsIgnoreCase("may")) {
+            return 4;
+        } else if (month.equalsIgnoreCase("june")) {
+            return 5;
+        } else if (month.equalsIgnoreCase("july")) {
+            return 6;
+        } else if (month.equalsIgnoreCase("august")) {
+            return 7;
+        } else if (month.equalsIgnoreCase("september")) {
+            return 8;
+        } else if (month.equalsIgnoreCase("october")) {
+            return 9;
+        } else if (month.equalsIgnoreCase("november")) {
+            return 10;
+        } else if (month.equalsIgnoreCase("december")) {
+            return 11;
+        }
+        return -1;
+    }
+
+    private static Calendar getDueDate(int month, int day) {
+        if (month < 0 ) {
+            return null;
+        }
+        int monthLength = YearMonth.of(Calendar.getInstance().get(Calendar.YEAR), month + 1).lengthOfMonth();
+        if (day <= 0 || day > monthLength) {
+            return null;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DATE, day);
+        Log.e("PARSER",month + " " + day);
+        return calendar;
     }
 }

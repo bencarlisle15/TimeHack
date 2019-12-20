@@ -1,7 +1,6 @@
 package com.bencarlisle.timehack.tasks;
 
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -11,8 +10,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.day.DayWidget;
-import com.bencarlisle.timehack.day.VoiceRecognitionActivity;
 import com.bencarlisle.timehack.main.DataControl;
 
 import java.util.Objects;
@@ -24,15 +21,9 @@ import java.util.regex.Pattern;
  */
 public class TaskWidget extends AppWidgetProvider {
 
-    private static int[] lastAppWidgetIds;
-    private static AppWidgetManager lastAppWidgetManager;
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
-        lastAppWidgetIds = appWidgetIds;
-        lastAppWidgetManager = appWidgetManager;
-        Log.e("TASK", "IS SET " + (lastAppWidgetIds == null));
         for (int appWidgetId : appWidgetIds) {
             new WidgetTaskHandler(context, appWidgetManager, appWidgetId);
             Intent intent = new Intent(context, TaskViewsService.class);
@@ -41,7 +32,6 @@ public class TaskWidget extends AppWidgetProvider {
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.main_tasks_layout);
             rv.setRemoteAdapter(R.id.tasks, intent);
             rv.setOnClickPendingIntent(R.id.start_button, getPendingSelfIntent(context));
-            rv.setPendingIntentTemplate(R.id.tasks, getPendingSelfIntent(context, "deleteTask"));
             appWidgetManager.updateAppWidget(appWidgetId, rv);
         }
     }
@@ -59,27 +49,15 @@ public class TaskWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         Log.e("TASK", "NEW ACTION " + intent.getAction());
-        Log.e("TASK", "IS SET 2 " + (lastAppWidgetIds == null));
         Matcher matcher = Pattern.compile("deleteTask(\\d+)").matcher(Objects.requireNonNull(intent.getAction()));
         if (matcher.find()) {
             new DataControl(context).removeTask(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));
-            for (int appWidgetId : lastAppWidgetIds) {
-                lastAppWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.scroll);
-            }
         }
     }
 
     private PendingIntent getPendingSelfIntent(Context context) {
-        Intent activityIntent = new Intent(context, DayWidget.class);
-        activityIntent.setAction("HELLO");
+        Intent activityIntent = new Intent(context, VoiceRecognitionActivity.class);
         return PendingIntent.getActivity(context, 0, activityIntent, 0);
-    }
-
-    private PendingIntent getPendingSelfIntent(Context context, String action) {
-        Intent clickIntent = new Intent(context, TaskWidget.class);
-
-        return PendingIntent.getBroadcast(context, 0,
-                clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
 

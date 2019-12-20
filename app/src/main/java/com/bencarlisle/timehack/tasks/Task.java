@@ -77,7 +77,7 @@ public class Task {
         return time.get(Calendar.HOUR) + ":" + time.get(Calendar.MINUTE) + " " + (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
     }
 
-    public int getHoursLeft() {
+    int getHoursLeft() {
         return (int) Math.ceil(getHoursRequired() - getHoursCompleted());
     }
 }

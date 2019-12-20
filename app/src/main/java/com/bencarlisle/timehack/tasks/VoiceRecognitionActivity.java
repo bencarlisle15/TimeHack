@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack.day;
+package com.bencarlisle.timehack.tasks;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timehack.main.Event;
 import com.bencarlisle.timehack.main.Parser;
 
@@ -14,16 +15,11 @@ import java.util.ArrayList;
 
 public class VoiceRecognitionActivity extends Activity {
     private int SPEECH_REQUEST_CODE = 1;
-    private static WidgetCalendarControl lastCalendarControl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sendRecognizeIntent();
-    }
-
-    public static void setCalendarControl(WidgetCalendarControl calendarControl) {
-        lastCalendarControl = calendarControl;
     }
 
     private void sendRecognizeIntent() {
@@ -36,6 +32,7 @@ public class VoiceRecognitionActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.e("RECIEVED", "ACIT " + data.getAction());
         if (requestCode == SPEECH_REQUEST_CODE) {
             if (resultCode == RESULT_OK && null != data) {
 
@@ -44,7 +41,7 @@ public class VoiceRecognitionActivity extends Activity {
                     String status = "Could not understand";
                     for (String result : results) {
                         Log.e("EVENT", result);
-                        String tempStatus = checkAndParseResult(result, lastCalendarControl);
+                        String tempStatus = checkAndParseResult(result);
                         Log.e("EVENT", tempStatus == null ? "NULL" : tempStatus);
                         if (tempStatus != null) {
                             status = tempStatus;
@@ -64,12 +61,12 @@ public class VoiceRecognitionActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private String checkAndParseResult(String result, CalendarModel calendarModel) {
-        Event event = Parser.parseEventResult(result);
-        if (event == null) {
+    private String checkAndParseResult(String result) {
+        Task task = Parser.parseTaskResult(result);
+        if (task == null) {
             return null;
         }
-        Event eventResult = calendarModel.addEvent(event, false);
-        return eventResult == null ? "Successfully Added" : ("Conflicting event: " + eventResult);
+        new DataControl(this).addTask(task);
+        return "Successfully Added";
     }
 }

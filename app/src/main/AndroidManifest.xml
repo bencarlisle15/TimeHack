@@ -51,6 +51,9 @@
         <activity
             android:name=".day.VoiceRecognitionActivity"
             android:label="speech" />
+        <activity
+            android:name=".tasks.VoiceRecognitionActivity"
+            android:label="speech" />
     </application>
 
 </manifest>
