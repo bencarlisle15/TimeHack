@@ -1,6 +1,8 @@
-package com.bencarlisle.timehack.tasks;
+package com.bencarlisle.timehack.main;
 
 import java.util.Calendar;
+
+import androidx.annotation.NonNull;
 
 public class Task {
 
@@ -22,7 +24,7 @@ public class Task {
     }
 
 
-    public Task(int id, long dueDateMillis, String description, int priority, float hoursRequired, float hoursCompleted) {
+    Task(int id, long dueDateMillis, String description, int priority, float hoursRequired, float hoursCompleted) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dueDateMillis);
         this.dueDate = calendar;
@@ -33,7 +35,7 @@ public class Task {
         this.id = id;
     }
 
-    public static void setTaskId(int taskId) {
+    static void setTaskId(int taskId) {
         TASK_ID = taskId;
     }
 
@@ -61,8 +63,9 @@ public class Task {
         return hoursCompleted;
     }
 
+    @NonNull
     public String toString() {
-        return description + " due at " + convertToString(dueDate) + " with priority " + priority;
+        return description + " due at " + Helper.convertDateToString(dueDate) + " with priority " + priority;
     }
 
     public int hashCode() {
@@ -73,11 +76,7 @@ public class Task {
         return o instanceof Task && o.hashCode() == hashCode();
     }
 
-    private String convertToString(Calendar time) {
-        return time.get(Calendar.HOUR) + ":" + time.get(Calendar.MINUTE) + " " + (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
-    }
-
-    int getHoursLeft() {
+    public int getHoursLeft() {
         return (int) Math.ceil(getHoursRequired() - getHoursCompleted());
     }
 }

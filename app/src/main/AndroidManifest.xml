@@ -12,14 +12,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <receiver android:name=".tasks.TaskWidget">
+        <receiver android:name=".main.StartWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/task_widget_info" />
+                android:resource="@xml/start_widget_info" />
+        </receiver>
+        <receiver android:name=".tasks.TasksWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tasks_widget_info" />
         </receiver>
         <receiver android:name=".day.DayWidget">
             <intent-filter>
@@ -34,9 +43,8 @@
         <service
             android:name=".day.TimeViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <service
-            android:name=".tasks.TaskViewsService"
+            android:name=".tasks.TasksViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity android:name=".main.MainActivity">
@@ -47,12 +55,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".day.DayActivity" />
+        <activity android:name=".returnables.ReturnablesActivity" />
         <activity android:name=".tasks.TasksActivity" />
         <activity
-            android:name=".day.VoiceRecognitionActivity"
-            android:label="speech" />
-        <activity
-            android:name=".tasks.VoiceRecognitionActivity"
+            android:name=".main.VoiceRecognitionActivity"
             android:label="speech" />
     </application>
 

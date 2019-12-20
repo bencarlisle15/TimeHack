@@ -4,9 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.main.Event;
 import com.bencarlisle.timehack.main.GeneralActivity;
-import com.bencarlisle.timehack.main.Parser;
 
 public class TasksActivity extends GeneralActivity {
 
@@ -21,14 +19,5 @@ public class TasksActivity extends GeneralActivity {
 
     public void deleteTask(View view) {
         tasksHandler.deleteTask(view.getId());
-    }
-
-    protected String checkAndParseResult(String result) {
-        Task task = Parser.parseTaskResult(result);
-        if (task == null) {
-            return null;
-        }
-        tasksHandler.addTask(task);
-        return "Successfully Added";
     }
 }

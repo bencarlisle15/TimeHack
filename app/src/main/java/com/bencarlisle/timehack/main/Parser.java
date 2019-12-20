@@ -2,8 +2,6 @@ package com.bencarlisle.timehack.main;
 
 import android.util.Log;
 
-import com.bencarlisle.timehack.tasks.Task;
-
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -11,7 +9,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser {
+class Parser {
 
     public static Event parseEventResult(String str) {
         Event event = parseEventWithoutFrom(str);
@@ -94,12 +92,12 @@ public class Parser {
         if (!matcher.find()) {
             return null;
         }
-        
+
         String description = matcher.group(1);
-        int month = getMonth(matcher.group(3));
-        int day = Integer.parseInt(matcher.group(4));
-        int hoursRequired = Integer.parseInt(matcher.group(5));
-        int priority = Integer.parseInt(matcher.group(6));
+        int month = getMonth(Objects.requireNonNull(matcher.group(3)));
+        int day = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
+        int hoursRequired = Integer.parseInt(Objects.requireNonNull(matcher.group(5)));
+        int priority = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
 
         Calendar dueDate = getDueDate(month, day);
 
@@ -153,5 +151,10 @@ public class Parser {
         calendar.set(Calendar.DATE, day);
         Log.e("PARSER",month + " " + day);
         return calendar;
+    }
+
+    public static Returnable parseReturnableResult(String result) {
+        //todo
+        return null;
     }
 }

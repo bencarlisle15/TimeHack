@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.bencarlisle.timehack.tasks.Task;
-
 import java.util.ArrayList;
 
 
@@ -20,6 +18,7 @@ public class DataControl extends SQLiteOpenHelper  {
 //        onUpgrade(db, 0,0);
 //        onCreate(db);
         Event.setEventId(getNextEventId());
+        Returnable.setReturnableId(getNextReturnableId());
         Task.setTaskId(getNextTaskId());
     }
 
@@ -47,6 +46,40 @@ public class DataControl extends SQLiteOpenHelper  {
         return events;
     }
 
+    public ArrayList<Returnable> getReturnables() {
+        Cursor cursor = db.rawQuery("SELECT * FROM Returnables",null);
+        ArrayList<Returnable> returnables = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String bitfield = cursor.getString(cursor.getColumnIndex("days"));
+                int eventId = cursor.getInt(cursor.getColumnIndex("eventId"));
+                Event event = getEvent(eventId);
+                if (event == null) {
+                    cursor.moveToNext();
+                    continue;
+                }
+                returnables.add(new Returnable(id, bitfield, event));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return returnables;
+    }
+
+    private Event getEvent(int eventId) {
+        Cursor cursor = db.rawQuery("SELECT * FROM Calendar WHERE id='" + eventId + "'", null);
+        Event event = null;
+        if (cursor.moveToFirst() && !cursor.isAfterLast()) {
+            int id = cursor.getInt(cursor.getColumnIndex("id"));
+            String description = cursor.getString(cursor.getColumnIndex("description"));
+            long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
+            long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
+            event = new Event(id, description, startTime, endTime);
+        }
+        cursor.close();
+        return event;
+    }
 
     public ArrayList<Task> getTasks() {
         Cursor cursor = db.rawQuery("SELECT * FROM Tasks",null);
@@ -70,12 +103,26 @@ public class DataControl extends SQLiteOpenHelper  {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Calendar (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("CREATE TABLE Returnables (id INTEGER UNIQUE PRIMARY KEY NOT NULL, days TEXT NOT NULL, eventId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Tasks (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, dueDate BIGINTEGER NOT NULL, priority INTEGER, hoursRequired FLOAT, hoursCompleted FLOAT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
     }
 
     private int getNextEventId() {
         //sql injection is trivial
         Cursor cursor = db.rawQuery("SELECT id FROM Calendar ORDER BY id DESC", null);
+        int id = 0;
+        if (cursor.moveToFirst()) {
+            if (!cursor.isAfterLast()) {
+                id = cursor.getInt(cursor.getColumnIndex("id")) + 1;
+            }
+        }
+        cursor.close();
+        return id;
+    }
+
+    private int getNextReturnableId() {
+        //sql injection is trivial
+        Cursor cursor = db.rawQuery("SELECT id FROM Returnables ORDER BY id DESC", null);
         int id = 0;
         if (cursor.moveToFirst()) {
             if (!cursor.isAfterLast()) {
@@ -106,6 +153,11 @@ public class DataControl extends SQLiteOpenHelper  {
         db.execSQL("INSERT INTO Calendar (id, description, startTime, endTime) VALUES ('" + event.getId() + "', '" + event.getDescription() + "', '" + event.getStartTime().getTimeInMillis() + "', '" + event.getEndTime().getTimeInMillis() + "');");
     }
 
+    public void addReturnable(Returnable returnable) {
+        Log.e("RETURNABLE", "ADDING returnable" + returnable);
+        db.execSQL("INSERT INTO Returnables (id, days, eventId) VALUES ('" + returnable.getId() + "', '" + returnable.getBitfield() + "', '" + returnable.getEvent().getId() + "');");
+    }
+
     public void addTask(Task task) {
         //sql injection is trivial
         Log.e("TASK", "ADDING TASK " + task);
@@ -116,6 +168,10 @@ public class DataControl extends SQLiteOpenHelper  {
         db.execSQL("DELETE FROM Calendar WHERE id='" + id + "'");
     }
 
+    public void removeReturnables(int id) {
+        db.execSQL("DELETE FROM Returnables WHERE id='" + id + "'");
+    }
+
     public void removeTask(int id) {
         db.execSQL("DELETE FROM Tasks WHERE id='" + id + "'");
     }
@@ -123,6 +179,7 @@ public class DataControl extends SQLiteOpenHelper  {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Calendar");
+        db.execSQL("DROP TABLE IF EXISTS Returnables");
         db.execSQL("DROP TABLE IF EXISTS Tasks");
         onCreate(db);
     }

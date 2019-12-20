@@ -9,21 +9,21 @@ import android.widget.RemoteViewsService;
 
 import com.bencarlisle.timehack.R;
 
-public class TaskViewsService extends RemoteViewsService {
+public class TasksViewsService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new TaskRemoteViewsFactory(this.getApplicationContext());
+        return new TasksRemoteViewsFactory(this.getApplicationContext());
     }
 }
 
-class TaskRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+class TasksRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private Context context;
     private static RemoteViews taskList;
     private static SparseArray<RemoteViews> tasks = new SparseArray<>();
 
-    TaskRemoteViewsFactory(Context context) {
+    TasksRemoteViewsFactory(Context context) {
         this.context = context;
     }
 

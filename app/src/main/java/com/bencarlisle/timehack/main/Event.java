@@ -55,15 +55,11 @@ public class Event {
 
     @NonNull
     public String toString() {
-        return description + " from " + convertToString(startTime) + " to " + convertToString(endTime);
+        return description + " from " + Helper.convertTimeToString(startTime) + " to " + Helper.convertTimeToString(endTime);
     }
 
     private String toSentenceCase(String str) {
         return String.valueOf(str.charAt(0)).toUpperCase() + str.substring(1);
-    }
-
-    private String convertToString(Calendar time) {
-        return time.get(Calendar.HOUR) + ":" + time.get(Calendar.MINUTE) + " " + (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
     }
 
     public String getDescription() {

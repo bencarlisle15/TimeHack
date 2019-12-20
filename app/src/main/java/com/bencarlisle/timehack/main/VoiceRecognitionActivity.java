@@ -1,4 +1,4 @@
-package com.bencarlisle.timehack.tasks;
+package com.bencarlisle.timehack.main;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.bencarlisle.timehack.main.DataControl;
-import com.bencarlisle.timehack.main.Event;
-import com.bencarlisle.timehack.main.Parser;
 
 import java.util.ArrayList;
 
@@ -32,7 +28,6 @@ public class VoiceRecognitionActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("RECIEVED", "ACIT " + data.getAction());
         if (requestCode == SPEECH_REQUEST_CODE) {
             if (resultCode == RESULT_OK && null != data) {
 
@@ -62,11 +57,21 @@ public class VoiceRecognitionActivity extends Activity {
     }
 
     private String checkAndParseResult(String result) {
-        Task task = Parser.parseTaskResult(result);
-        if (task == null) {
-            return null;
+        Event event = Parser.parseEventResult(result);
+        if (event != null) {
+            new DataControl(this).addEvent(event);
+            return "Successfully added event";
         }
-        new DataControl(this).addTask(task);
-        return "Successfully Added";
+        Returnable returnable = Parser.parseReturnableResult(result);
+        if (returnable != null) {
+            new DataControl(this).addReturnable(returnable);
+            return "Successfully added returnable";
+        }
+        Task task = Parser.parseTaskResult(result);
+        if (task != null) {
+            new DataControl(this).addTask(task);
+            return "Successfully added task";
+        }
+        return null;
     }
 }

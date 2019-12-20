@@ -3,19 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/start_button"
-        android:onClick="start"/>
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tasks"
         android:background="@android:color/white"
-        android:layout_below="@id/start_button">
+        android:layout_alignParentTop="true">
     </ListView>
 </RelativeLayout>

@@ -1,13 +1,11 @@
-package com.bencarlisle.timehack.tasks;
+package com.bencarlisle.timehack.main;
 
-import android.util.Log;
+public class Merger {
 
-class Merger {
+    private Pollable pollable;
 
-    private TaskModel taskModel;
-
-    public Merger(TaskModel taskModel) {
-        this.taskModel = taskModel;
+    public Merger(Pollable pollable) {
+        this.pollable = pollable;
     }
 
     public void start() {
@@ -21,7 +19,7 @@ class Merger {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            taskModel.poll();
+            pollable.poll();
         }
     }
 }

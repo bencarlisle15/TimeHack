@@ -9,9 +9,8 @@ import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.main.Event;
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.tasks.TaskWidget;
 
-public class WidgetCalendarControl extends CalendarModel {
+class WidgetCalendarControl extends CalendarModel {
     private AppWidgetManager appWidgetManager;
     private int appWidgetId;
 

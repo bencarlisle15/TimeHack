@@ -4,30 +4,33 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bencarlisle.timehack.main.DataControl;
+import com.bencarlisle.timehack.main.Merger;
+import com.bencarlisle.timehack.main.Pollable;
+import com.bencarlisle.timehack.main.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public abstract class TaskModel {
+public abstract class TasksModel implements Pollable {
 
     final ArrayList<Task> tasks = new ArrayList<>();
     DataControl dataControl;
 
-    public abstract void addTaskView(Task task);
-    public abstract void deleteTask(int id);
+    protected abstract void addTaskView(Task task);
+    protected abstract void deleteTask(int id);
 
-    TaskModel(Context context) {
+    TasksModel(Context context) {
         dataControl = new DataControl(context);
 //        dataControl.clearTasks();
         new Merger(this).start();
     }
 
-    public void start() {
+    void start() {
         initTasks();
 //        createTempEvent();
     }
 
-    void poll() {
+    public void poll() {
         synchronized (tasks) {
             ArrayList<Task> newTasks= dataControl.getTasks();
             for (Task task: newTasks) {
@@ -67,14 +70,9 @@ public abstract class TaskModel {
         }
     }
 
-    void addTask(Task task) {
+    private void addTask(Task task) {
         dataControl.addTask(task);
         tasks.add(task);
         addTaskView(task);
-    }
-
-
-    String convertToDate(Calendar dueDate) {
-        return (dueDate.get(Calendar.MONTH) + 1) + "/" + dueDate.get(Calendar.DATE);
     }
 }

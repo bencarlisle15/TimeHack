@@ -7,11 +7,13 @@ import android.util.TypedValue;
 
 import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timehack.main.Event;
+import com.bencarlisle.timehack.main.Merger;
+import com.bencarlisle.timehack.main.Pollable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-abstract class CalendarModel {
+abstract class CalendarModel implements Pollable {
 
     final ArrayList<Event> events = new ArrayList<>();
     Context context;
@@ -35,7 +37,7 @@ abstract class CalendarModel {
 //        createTempEvent();
     }
 
-    void poll() {
+    public void poll() {
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
             for (Event event : newEvents) {
@@ -67,7 +69,7 @@ abstract class CalendarModel {
             Calendar endTime = Calendar.getInstance();
             endTime.set(Calendar.HOUR_OF_DAY, 3);
             endTime.set(Calendar.MINUTE, 45);
-            addEvent(new Event(time, endTime, "HELLO FRIEND"), false);
+            addEvent(new Event(time, endTime, "HELLO FRIEND"));
         }).start();
     }
 
@@ -77,7 +79,7 @@ abstract class CalendarModel {
         synchronized (events) {
             for (Event event : events) {
                 Log.e("EVENT", event.toString());
-                addEvent(event, false);
+                addEvent(event);
             }
         }
     }
@@ -97,19 +99,11 @@ abstract class CalendarModel {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
-    Event addEvent(final Event event, @SuppressWarnings("SameParameterValue") boolean force) {
-//        if (!force) {
-//            for (Event e : events) {
-//                if (e.isOverlapping(event)) {
-//                    return e;
-//                }
-//            }
-//        }
+    private void addEvent(final Event event) {
         events.add(event);
         dataControl.addEvent(event);
         Log.e("EVENT", event.toString());
         addEventToCalendar(event);
-        return null;
     }
 
     private void addEventToCalendar(Event event) {

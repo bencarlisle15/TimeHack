@@ -10,8 +10,6 @@ import android.widget.RelativeLayout;
 
 import com.bencarlisle.timehack.R;
 
-import java.io.Serializable;
-
 class Adapter implements ListAdapter {
 
     private RelativeLayout calendar;
