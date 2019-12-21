@@ -63,7 +63,7 @@ abstract class ReturnablesModel implements Pollable {
             Calendar endTime = Calendar.getInstance();
             endTime.set(Calendar.HOUR_OF_DAY, 3);
             endTime.set(Calendar.MINUTE, 45);
-            Event event = new Event(time, endTime, "HELLO FRIEND");
+            Event event = new Event(time, endTime, "HELLO FRIEND", -1);
             boolean[] days = new boolean[]{false,true,false,true,false,true,false};
             addReturnable(new Returnable(days, event));
         }).start();
@@ -79,7 +79,6 @@ abstract class ReturnablesModel implements Pollable {
 
     private void addReturnable(Returnable returnable) {
         dataControl.addReturnable(returnable);
-        dataControl.addEvent(returnable.getEvent());
         returnables.add(returnable);
         addReturnableView(returnable);
     }

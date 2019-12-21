@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 class Parser {
 
     static Event parseEventResult(String result) {
-        Matcher matcher = Pattern.compile("^(from)? (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.*)$").matcher(result);
+        Matcher matcher = Pattern.compile("^(from)? (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
         }
@@ -23,12 +23,14 @@ class Parser {
         String endAm = matcher.group(9);
         String description = matcher.group(10);
 
+        description = Objects.requireNonNull(description).substring(0, 1).toUpperCase() + description.substring(1);
+
         Calendar startTime = getTime(startHour, startMinute, startAm);
         Calendar endTime = getTime(endHour, endMinute, endAm);
         if (startTime == null || endTime == null) {
             return null;
         }
-        return new Event(startTime, endTime, description);
+        return new Event(startTime, endTime, description, -1);
     }
 
     static Task parseTaskResult(String str) {
@@ -42,6 +44,8 @@ class Parser {
         int day = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
         int hoursRequired = Integer.parseInt(Objects.requireNonNull(matcher.group(5)));
         int priority = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
+
+        description = Objects.requireNonNull(description).substring(0, 1).toUpperCase() + description.substring(1);
 
         Calendar dueDate = getDate(month, day);
 
@@ -97,7 +101,7 @@ class Parser {
     }
 
     static Returnable parseReturnableResult(String result) {
-        Matcher matcher = Pattern.compile("^([a-zA-Z ]*) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.*)$").matcher(result);
+        Matcher matcher = Pattern.compile("^([a-zA-Z ]+) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
         }
@@ -110,13 +114,15 @@ class Parser {
         String endAm = matcher.group(9);
         String description = matcher.group(10);
 
+        description = Objects.requireNonNull(description).substring(0, 1).toUpperCase() + description.substring(1);
+
         boolean[] days = getDays(Objects.requireNonNull(daysString));
         Calendar startTime = getTime(startHour, startMinute, startAm);
         Calendar endTime = getTime(endHour, endMinute, endAm);
         if (startTime == null || endTime == null || days == null) {
             return null;
         }
-        Event event = new Event(startTime, endTime, description);
+        Event event = new Event(startTime, endTime, description, -1);
         return new Returnable(days, event);
     }
 

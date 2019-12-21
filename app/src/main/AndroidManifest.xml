@@ -41,6 +41,16 @@
         </receiver>
 
         <service
+            android:name=".main.Organizer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name=".day.TimeViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service

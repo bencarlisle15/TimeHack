@@ -1,10 +1,11 @@
 package com.bencarlisle.timehack.main;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 
-public class Task {
+public class Task implements Comparable<Task> {
 
     private static int TASK_ID = 0;
     private int id;
@@ -37,6 +38,11 @@ public class Task {
 
     static void setTaskId(int taskId) {
         TASK_ID = taskId;
+    }
+
+    public int getDaysLeft() {
+        long millisDifference = Calendar.getInstance().getTimeInMillis() - dueDate.getTimeInMillis();
+        return (int) TimeUnit.MILLISECONDS.toDays(millisDifference);
     }
 
     public int getId() {
@@ -78,5 +84,35 @@ public class Task {
 
     public int getHoursLeft() {
         return (int) Math.ceil(getHoursRequired() - getHoursCompleted());
+    }
+
+    public float getNextHours() {
+        float hoursLeft = getHoursLeft();
+        for (int i = 0; i < getDaysLeft(); i++) {
+            hoursLeft = singleRound(hoursLeft);
+        }
+        return hoursLeft;
+    }
+
+    private float singleRound(float hoursLeft) {
+        float nextHours = (float) Math.log(hoursLeft);
+        if (nextHours < 0.125f) {
+            return 0;
+        } else if (nextHours % 1 < 0.125f) {
+            return (float) Math.floor(nextHours);
+        } else if (nextHours % 1 < 0.375f) {
+            return (float) (Math.floor(nextHours) + 0.5f);
+        }
+        return (float) Math.ceil(nextHours);
+    }
+
+    public boolean performHours(float hours) {
+        hoursCompleted += hours;
+        return hoursCompleted < hoursRequired;
+    }
+
+    @Override
+    public int compareTo(Task t) {
+        return t.getPriority() - getPriority();
     }
 }

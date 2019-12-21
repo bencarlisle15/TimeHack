@@ -33,7 +33,6 @@ abstract class CalendarModel implements Pollable {
         dataControl = new DataControl(context);
         initCalendar();
         new Merger(this).start();
-        new Resetter(this).start();
 //        createTempEvent();
     }
 
@@ -69,7 +68,7 @@ abstract class CalendarModel implements Pollable {
             Calendar endTime = Calendar.getInstance();
             endTime.set(Calendar.HOUR_OF_DAY, 3);
             endTime.set(Calendar.MINUTE, 45);
-            addEvent(new Event(time, endTime, "HELLO FRIEND"));
+            addEvent(new Event(time, endTime, "HELLO FRIEND", -1));
         }).start();
     }
 
