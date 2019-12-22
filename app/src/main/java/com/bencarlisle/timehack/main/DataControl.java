@@ -169,7 +169,7 @@ public class DataControl extends SQLiteOpenHelper  {
     }
 
     ArrayList<Returnable> getReturnablesOnDay(int day) {
-        Cursor cursor = db.rawQuery("SELECT * FROM Returnables WHERE SUBSTRING(days, " + (day + 1) + ", 1)='1';", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM Returnables WHERE SUBSTR(days, " + (day + 1) + ", 1)='1';", null);
         ArrayList<Returnable> returnables = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
