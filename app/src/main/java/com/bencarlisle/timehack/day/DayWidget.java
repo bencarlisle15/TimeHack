@@ -10,8 +10,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.main.DataControl;
-import com.bencarlisle.timehack.main.VoiceRecognitionActivity;
+import com.bencarlisle.timelibrary.main.DataControl;
+import com.bencarlisle.timelibrary.main.VoiceRecognitionActivity;
 
 import java.util.Objects;
 import java.util.regex.Matcher;

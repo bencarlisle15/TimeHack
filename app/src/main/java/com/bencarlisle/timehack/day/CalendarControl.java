@@ -6,8 +6,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bencarlisle.timehack.main.Event;
-import com.bencarlisle.timehack.R;
+import com.bencarlisle.timelibrary.R;
+import com.bencarlisle.timelibrary.day.Adapter;
+import com.bencarlisle.timelibrary.main.Event;
 
 class CalendarControl extends CalendarModel {
     private Adapter adapter;
@@ -19,6 +20,7 @@ class CalendarControl extends CalendarModel {
         adapter =  new Adapter(activity);
         ((ListView) activity.findViewById(R.id.scroll)).setAdapter(adapter);
         start();
+        createTempEvent();
     }
 
     public void clearViews() {
@@ -31,7 +33,7 @@ class CalendarControl extends CalendarModel {
         deleteEvent(id);
     }
 
-    void deleteEvent(int id) {
+    protected void deleteEvent(int id) {
         activity.runOnUiThread(() -> {
             synchronized (events) {
                 dataControl.removeEvent(id);
@@ -46,7 +48,7 @@ class CalendarControl extends CalendarModel {
         });
     }
 
-    void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
+    protected void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
         activity.runOnUiThread(() -> addEventViewToCalendarRunnable(height, width, spacerHeight, newDescriptionTextSize, event));
     }
 

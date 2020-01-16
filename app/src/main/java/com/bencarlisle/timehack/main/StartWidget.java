@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.R;
+import com.bencarlisle.timelibrary.main.VoiceRecognitionActivity;
 
 /**
  * Implementation of App Widget functionality.

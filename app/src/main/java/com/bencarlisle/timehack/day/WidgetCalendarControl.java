@@ -4,11 +4,11 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.bencarlisle.timehack.main.Event;
 import com.bencarlisle.timehack.R;
+import com.bencarlisle.timelibrary.day.CalendarModel;
+import com.bencarlisle.timelibrary.main.Event;
 
 class WidgetCalendarControl extends CalendarModel {
     private AppWidgetManager appWidgetManager;
@@ -19,10 +19,10 @@ class WidgetCalendarControl extends CalendarModel {
         this.appWidgetManager = appWidgetManager;
         this.appWidgetId = appWidgetId;
         start();
+//        createTempEvent();
     }
 
-    void deleteEvent(int id) {
-        Log.e("EVENT FOUND", "DELETING EVENT " + id);
+    protected void deleteEvent(int id) {
         synchronized (events) {
             dataControl.removeEvent(id);
             TimeRemoteViewsFactory.removeView(id);
@@ -43,10 +43,9 @@ class WidgetCalendarControl extends CalendarModel {
             }
         }
         updateWidget();
-        Log.e("EVENT", "CLEARED");
     }
 
-    void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
+    protected void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
         width -= convertDPtoPixels(25);
         RemoteViews newEvent = new RemoteViews(context.getPackageName(), R.layout.calendar_event);
         newEvent.setFloat(R.id.event_text, "setTextSize", newDescriptionTextSize);

@@ -3,8 +3,8 @@ package com.bencarlisle.timehack.day;
 import android.os.Bundle;
 import android.view.View;
 
-import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.main.GeneralActivity;
+import com.bencarlisle.timelibrary.R;
+import com.bencarlisle.timelibrary.main.GeneralActivity;
 
 public class DayActivity extends GeneralActivity {
     private transient CalendarControl calendar;

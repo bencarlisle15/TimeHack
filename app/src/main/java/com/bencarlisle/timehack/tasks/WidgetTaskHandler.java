@@ -4,12 +4,12 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timehack.main.Helper;
-import com.bencarlisle.timehack.main.Task;
+import com.bencarlisle.timelibrary.main.Helper;
+import com.bencarlisle.timelibrary.main.Task;
+import com.bencarlisle.timelibrary.tasks.TasksModel;
 
 class WidgetTaskHandler extends TasksModel {
     private AppWidgetManager appWidgetManager;
@@ -22,7 +22,6 @@ class WidgetTaskHandler extends TasksModel {
         this.appWidgetManager = appWidgetManager;
         this.appWidgetId = appWidgetId;
         start();
-//        createTempEvent();
     }
 
     public void deleteTask(int id) {
@@ -46,7 +45,6 @@ class WidgetTaskHandler extends TasksModel {
             }
         }
         updateWidget();
-        Log.e("TASK", "CLEARED");
     }
 
     public void addTaskView(Task task) {

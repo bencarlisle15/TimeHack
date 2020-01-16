@@ -3,14 +3,16 @@ package com.bencarlisle.timehack.main;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.day.DayActivity;
+import com.bencarlisle.timelibrary.main.GeneralActivity;
+import com.bencarlisle.timelibrary.main.Organizer;
 
 public class MainActivity extends GeneralActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        startActivity(new Intent(this, DayActivity.class));
         startService(new Intent(this, Organizer.class));
     }
 }

@@ -5,25 +5,25 @@ import android.content.res.Resources;
 import android.util.Log;
 import android.util.TypedValue;
 
-import com.bencarlisle.timehack.main.DataControl;
-import com.bencarlisle.timehack.main.Event;
-import com.bencarlisle.timehack.main.Merger;
-import com.bencarlisle.timehack.main.Pollable;
+import com.bencarlisle.timelibrary.main.DataControl;
+import com.bencarlisle.timelibrary.main.Event;
+import com.bencarlisle.timelibrary.main.Merger;
+import com.bencarlisle.timelibrary.main.Pollable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
-abstract class CalendarModel implements Pollable {
+public abstract class CalendarModel implements Pollable {
 
     final ArrayList<Event> events = new ArrayList<>();
-    Context context;
+    private Context context;
     DataControl dataControl;
 
-    abstract void clearViews();
+    protected abstract void clearViews();
 
-    abstract void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event);
+    protected abstract void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event);
 
-    abstract void deleteEvent(int id);
+    protected abstract void deleteEvent(int id);
 
     CalendarModel(Context context) {
         this.context = context;
@@ -36,7 +36,7 @@ abstract class CalendarModel implements Pollable {
 //        createTempEvent();
     }
 
-    public void poll() {
+    public synchronized void poll() {
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
             for (Event event : newEvents) {
@@ -55,10 +55,10 @@ abstract class CalendarModel implements Pollable {
         }
     }
 
-    private void createTempEvent() {
+    void createTempEvent() {
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -89,7 +89,7 @@ abstract class CalendarModel implements Pollable {
         events.clear();
     }
 
-    float convertDPtoPixels(float dp) {
+    private float convertDPtoPixels(float dp) {
         Resources r = context.getResources();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
@@ -99,14 +99,15 @@ abstract class CalendarModel implements Pollable {
     }
 
     private void addEvent(final Event event) {
-        events.add(event);
-        dataControl.addEvent(event);
-        Log.e("EVENT", event.toString());
-        addEventToCalendar(event);
+        synchronized (events) {
+            events.add(event);
+            dataControl.addEvent(event);
+            addEventToCalendar(event);
+        }
     }
 
     private void addEventToCalendar(Event event) {
-        Log.e("EVENT", "ADDING NEW EVENT" + event.toString());
+        Log.e("EVENT", "ADDING NEW EVENT TO CALENDAR" + event.toString());
         int startHour = event.getStartTime().get(Calendar.HOUR_OF_DAY);
         int startMinute = event.getStartTime().get(Calendar.MINUTE);
         int endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
@@ -114,11 +115,12 @@ abstract class CalendarModel implements Pollable {
         double numberOfHoursBeforeStart = startHour + startMinute / 60.0;
         double numberOfHours = (endHour - startHour) + (endMinute - startMinute) / 60.0;
 
-        float rowHeight = convertDPtoPixels(75);
+        float rowHeight = convertDPtoPixels(50);
         float rowOffset = convertDPtoPixels(70);
+        float heightOffset = convertDPtoPixels(30);
         int height = (int) (rowHeight * numberOfHours);
         int width = (int) (getWindowWidth() - rowOffset);
-        int spacerHeight = (int) (rowHeight * numberOfHoursBeforeStart);
+        int spacerHeight = (int) (rowHeight * numberOfHoursBeforeStart + heightOffset);
 
         int newDescriptionTextSize = 10;
         if (numberOfHours >= 0.5) {
