@@ -94,7 +94,7 @@ public abstract class CalendarModel implements Pollable {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
-    protected int getWindowWidth() {
+    int getWindowWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 

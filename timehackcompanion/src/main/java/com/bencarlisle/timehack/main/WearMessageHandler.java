@@ -1,6 +1,7 @@
 package com.bencarlisle.timehack.main;
 
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -10,11 +11,9 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.util.HashMap;
-
 public class WearMessageHandler extends WearableListenerService {
 
-    private static HashMap<Integer, byte[]> messages = new HashMap<>();
+    private static SparseArray<byte[]> messages = new SparseArray<>();
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
@@ -34,12 +33,14 @@ public class WearMessageHandler extends WearableListenerService {
     }
 
     public boolean hasMessage(int id) {
-        return messages.containsKey(id);
+        return messages.indexOfKey(id) != -1;
     }
 
     public byte[] getMessage(int id) {
         if (hasMessage(id)) {
-            return messages.remove(id);
+            byte[] message = messages.get(id);
+            messages.remove(id);
+            return message;
         }
         return null;
 

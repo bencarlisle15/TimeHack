@@ -2,7 +2,6 @@ package com.bencarlisle.timelibrary.main;
 
 import androidx.annotation.NonNull;
 
-import java.nio.ByteBuffer;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -37,8 +36,12 @@ public class Task implements Comparable<Task>, Serializable {
         this.id = id;
     }
 
-    public Task(byte[] message) {
-        this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+    public Task(byte[] message, boolean needsId) {
+        if (needsId) {
+            this.id = TASK_ID++;
+        } else {
+            this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+        }
         long dueDate = Helper.readLongFromBytes(message, 8, 4);
         this.priority = (int) Helper.readLongFromBytes(message, 4, 12);
         this.hoursRequired = Helper.readFloatFromBytes(message, 16);

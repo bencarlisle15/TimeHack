@@ -46,8 +46,8 @@ public class Helper {
     }
 
     public static void writeBytesToBytes(byte[] message, byte[] original, int pos) {
-        for (int i = 0; i < original.length; i++) {
-            message[pos++] = original[i];
+        for (byte b : original) {
+            message[pos++] = b;
         }
     }
 
@@ -97,16 +97,16 @@ public class Helper {
     }
 
     public static ArrayList<byte[]> readList(byte[] message) {
-        ArrayList<byte[]> objs = new ArrayList<>();
+        ArrayList<byte[]> byteArrays = new ArrayList<>();
         int listSize = (int) Helper.readLongFromBytes(message, 4, 0);
         int pos = 4;
         for (int i = 0; i < listSize; i++) {
             int size = (int) Helper.readLongFromBytes(message, 4, pos);
-            byte[] obj = Arrays.copyOfRange(message, pos + 4, pos + 4 + size);
-            objs.add(obj);
+            byte[] byteArray = Arrays.copyOfRange(message, pos + 4, pos + 4 + size);
+            byteArrays.add(byteArray);
             pos += 4 + size;
         }
-        return objs;
+        return byteArrays;
     }
 
     public static void printArray(byte[] bytes) {
@@ -118,7 +118,7 @@ public class Helper {
         Log.e("ARRAY", str.toString());
     }
 
-    public static byte[] serializeWithLength(Serializable serializable) {
+    private static byte[] serializeWithLength(Serializable serializable) {
         int size = serializable.getSize();
         byte[] message = new byte[size + 4];
         Helper.writeLongToBytes(message, size, 4, 0);

@@ -2,7 +2,6 @@ package com.bencarlisle.timelibrary.day;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -13,11 +12,11 @@ import com.bencarlisle.timelibrary.R;
 public class Adapter implements ListAdapter {
 
     private RelativeLayout calendar;
-    int numberOfViews = 0;
-    boolean deleteNext = false;
+    private int numberOfViews = 0;
+    private boolean deleteNext = false;
 
     public Adapter(Context context) {
-        calendar = (RelativeLayout)  LayoutInflater.from(context).inflate(R.layout.time_layout, null);
+        calendar = (RelativeLayout)  View.inflate(context, R.layout.time_layout, null);
     }
 
     public void addView(View view) {

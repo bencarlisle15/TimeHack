@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DataControl extends SQLiteOpenHelper {
     private SQLiteDatabase db;
@@ -18,7 +19,7 @@ public class DataControl extends SQLiteOpenHelper {
         setIds();
     }
 
-    public void setIds() {
+    private void setIds() {
         Event.setEventId(getNextEventId());
         Returnable.setReturnableId(getNextReturnableId());
         Task.setTaskId(getNextTaskId());
@@ -43,11 +44,27 @@ public class DataControl extends SQLiteOpenHelper {
         return getTasks(cursor);
     }
 
+    public void runOrganizer() {
+        int day = Calendar.getInstance().get(Calendar.DATE);
+        db.execSQL("UPDATE Organized SET lastDay=" + day + ";");
+    }
+
+
+    boolean isAlreadyRun() {
+        int day = Calendar.getInstance().get(Calendar.DATE);
+        Cursor cursor = db.rawQuery("SELECT * FROM Organized;",null);
+        int lastDay = cursor.getInt(0);
+        cursor.close();
+        return lastDay == day;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Calendar (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Returnables (id INTEGER UNIQUE PRIMARY KEY NOT NULL, days TEXT NOT NULL, eventId INTEGER NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Tasks (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, dueDate BIGINTEGER NOT NULL, priority INTEGER, hoursRequired FLOAT, hoursCompleted FLOAT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("CREATE TABLE Organized (lastDay INTEGER)");
+        db.execSQL("INSERT INTO Organized VALUES(-1)");
     }
 
     public int getNextEventId() {
@@ -145,15 +162,15 @@ public class DataControl extends SQLiteOpenHelper {
         return events;
     }
 
-    public void addTaskHours(int taskId, float hoursCompleted) {
+    void addTaskHours(int taskId, float hoursCompleted) {
         db.execSQL("UPDATE Tasks SET hoursCompleted=(hoursCompleted + " + hoursCompleted + ") WHERE id='" + taskId + "';");
     }
 
-    public void cleanTasks() {
+    void cleanTasks() {
         db.execSQL("DELETE FROM Tasks where hoursCompleted >= hoursRequired");
     }
 
-    public Cursor rawQuery(String query) {
+    Cursor rawQuery(String query) {
         return db.rawQuery(query, null);
     }
 
@@ -161,7 +178,7 @@ public class DataControl extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    public static ArrayList<Event> getEvents(Cursor cursor) {
+    private static ArrayList<Event> getEvents(Cursor cursor) {
         ArrayList<Event> events = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -178,7 +195,7 @@ public class DataControl extends SQLiteOpenHelper {
         return events;
     }
 
-    public static ArrayList<Returnable> getReturnables(Cursor cursor) {
+    private static ArrayList<Returnable> getReturnables(Cursor cursor) {
         ArrayList<Returnable> returnables = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -198,7 +215,7 @@ public class DataControl extends SQLiteOpenHelper {
         return returnables;
     }
 
-    public static ArrayList<Task> getTasks(Cursor cursor) {
+    private static ArrayList<Task> getTasks(Cursor cursor) {
         ArrayList<Task> tasks = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -216,7 +233,7 @@ public class DataControl extends SQLiteOpenHelper {
         return tasks;
     }
 
-    public static int getNextId(Cursor cursor) {
+    private static int getNextId(Cursor cursor) {
         int id = 0;
         if (cursor.moveToFirst()) {
             if (!cursor.isAfterLast()) {
@@ -227,7 +244,7 @@ public class DataControl extends SQLiteOpenHelper {
         return id;
     }
 
-    public static String getSQL(String function, Object extra) {
+    private static String getSQL(String function, Object extra) {
         switch (function) {
             case "getNextEventId":
                 return "SELECT id FROM Calendar ORDER BY id DESC;";

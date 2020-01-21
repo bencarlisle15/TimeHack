@@ -30,8 +30,12 @@ public class Returnable implements Serializable {
         this.id = id;
     }
 
-    public Returnable(byte[] message) {
-        this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+    public Returnable(byte[] message, boolean needsId) {
+        if (needsId) {
+            this.id = RETURNABLE_ID++;
+        } else {
+            this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+        }
         String bitfield = Helper.readStringFromBytes(message, 11, 4);
         boolean[] days = new boolean[bitfield.length()];
         for (int i = 0; i < bitfield.length(); i++) {
@@ -39,7 +43,7 @@ public class Returnable implements Serializable {
         }
         this.days = days;
         byte[] eventArray = Arrays.copyOf(message, 11);
-        this.event = new Event(eventArray);
+        this.event = new Event(eventArray, needsId);
     }
 
     public static void setReturnableId(int returnableId) {

@@ -1,11 +1,11 @@
-package com.bencarlisle.timelibrary.tasks;
+package com.bencarlisle.timehack.tasks;
 
 import android.app.Activity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bencarlisle.timelibrary.R;
+import com.bencarlisle.timehack.R;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Task;
 import com.bencarlisle.timelibrary.main.ViewAdapter;

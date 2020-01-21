@@ -15,4 +15,5 @@ public class MainActivity extends GeneralActivity {
         startActivity(new Intent(this, DayActivity.class));
         startService(new Intent(this, Organizer.class));
     }
+
 }

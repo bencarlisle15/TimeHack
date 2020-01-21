@@ -10,8 +10,6 @@ import com.bencarlisle.timelibrary.tasks.TasksActivity;
 
 public abstract class GeneralActivity extends Activity {
 
-    private final int REQ_CODE_SPEECH_INPUT = 100;
-
     public void dayCalendar(View view) {
         if (!(this instanceof DayActivity)) {
             startActivity(new Intent(this, DayActivity.class));

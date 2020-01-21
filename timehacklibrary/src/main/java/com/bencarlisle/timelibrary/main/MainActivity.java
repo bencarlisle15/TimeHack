@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.bencarlisle.timelibrary.R;
-import com.bencarlisle.timelibrary.day.DayActivity;
 
 public class MainActivity extends GeneralActivity {
 

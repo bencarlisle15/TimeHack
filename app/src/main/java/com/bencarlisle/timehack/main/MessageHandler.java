@@ -37,10 +37,9 @@ public class MessageHandler extends WearableListenerService {
         if (dataMap.getBoolean("isResponse")) {
             return;
         }
-        byte[] data = dataMap.getByteArray("message");
         int id = dataMap.getInt("id");
-        Log.e("App", "Received message: " + new String(data) + ":" + id);
-        byte[] response = handleMessage(new String(data));
+        Log.e("App", "Received message: " + new String(dataMap.getByteArray("message")) + ":" + id);
+        byte[] response = handleMessage(dataMap);
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/bencarlisle");
         dataMap = putDataMapRequest.getDataMap();
         dataMap.putInt("id", id);
@@ -51,7 +50,8 @@ public class MessageHandler extends WearableListenerService {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private byte[] handleMessage(String data) {
+    private byte[] handleMessage(DataMap dataMap) {
+        String data = new String(dataMap.getByteArray("message"));
         byte[] response = null;
         DataControl dataControl = new DataControl(this);
         if (data.equals("getEvents")) {
@@ -73,7 +73,6 @@ public class MessageHandler extends WearableListenerService {
             int taskId = dataControl.getNextTaskId();
             response = String.valueOf(taskId).getBytes();
         } else if (data.matches("^removeEvent(\\d+)$")) {
-            Log.e("Wear", data);
             Matcher matcher = Pattern.compile("^removeEvent(\\d+)$").matcher(data);
             matcher.matches();
             int id = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
@@ -88,6 +87,18 @@ public class MessageHandler extends WearableListenerService {
             matcher.matches();
             int id = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
             dataControl.removeTask(id);
+        } else if (data.equals("addEvent")) {
+            byte[] event = dataMap.getByteArray("data");
+            Helper.printArray(data.getBytes());
+            dataControl.addEvent(new Event(event, true));
+        } else if (data.equals("addReturnable")) {
+            byte[] returnable = dataMap.getByteArray("data");
+            dataControl.addReturnable(new Returnable(returnable, true));
+        } else if (data.equals("addTask")) {
+            byte[] task = dataMap.getByteArray("data");
+            dataControl.addTask(new Task(task, true));
+        } else {
+            Log.e("App", "Command: '" + data + "' not found");
         }
         return response;
     }

@@ -1,7 +1,7 @@
 package com.bencarlisle.timelibrary.main;
 
-public interface Serializable {
+interface Serializable {
 
-    public byte[] serialize();
-    public int getSize();
+    byte[] serialize();
+    int getSize();
 }

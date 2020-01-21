@@ -1,10 +1,11 @@
 package com.bencarlisle.timehack.main;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.bencarlisle.timelibrary.main.DataControl;
-import com.bencarlisle.timelibrary.main.DatabaseProvider;
 import com.bencarlisle.timelibrary.main.Event;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Returnable;
@@ -21,6 +22,8 @@ public class SharedDataControl {
 
     private Context context;
     private WearMessageHandler messageHandler;
+    private final static int MAX_RETRIES = 5;
+    private static volatile int ID = new Random().nextInt();
 
     public SharedDataControl(Context context) {
         this.context = context;
@@ -32,86 +35,89 @@ public class SharedDataControl {
     public ArrayList<Event> getEvents() {
         Log.e("Wear", "Getting events");
         byte[] result = sendAndReceive("getEvents");
-        ArrayList<byte[]> bytes = Helper.readList(result);
+        if (result == null) {
+            return null;
+        }
         ArrayList<Event> events = new ArrayList<>();
+        ArrayList<byte[]> bytes = Helper.readList(result);
         for (byte[] byteArray: bytes) {
-            events.add(new Event(byteArray));
+            events.add(new Event(byteArray, false));
         }
         return events;
     }
 
-    public ArrayList<Returnable> getReturnables() {
-        byte[] result = sendAndReceive("getReturnables");
-        ArrayList<byte[]> bytes = Helper.readList(result);
-        ArrayList<Returnable> returnables = new ArrayList<>();
-        for (byte[] byteArray: bytes) {
-            returnables.add(new Returnable(byteArray));
-        }
-        return returnables;
-    }
-
     public ArrayList<Task> getTasks() {
         byte[] result = sendAndReceive("getTasks");
-        ArrayList<byte[]> bytes = Helper.readList(result);
+        if (result == null) {
+            return null;
+        }
         ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<byte[]> bytes = Helper.readList(result);
         for (byte[] byteArray: bytes) {
-            tasks.add(new Task(byteArray));
+            tasks.add(new Task(byteArray, false));
         }
         return tasks;
     }
 
-    private int getNextEventId() {
-        byte[] result = sendAndReceive(DataControl.getSQL("getNextEventId", null));
-        return (int) Helper.readLongFromBytes(result, 4, 0);
-    }
-
-    private int getNextReturnableId() {
-        byte[] result = sendAndReceive(DataControl.getSQL("getNextReturnableId", null));
-        return (int) Helper.readLongFromBytes(result, 4, 0);
-    }
-
-    private int getNextTaskId() {
-        byte[] result = sendAndReceive(DataControl.getSQL("getNextTaskId", null));
-        return (int) Helper.readLongFromBytes(result, 4, 0);
-    }
-
     public void removeEvent(int id) {
-        sendSingleMessage("removeEvent" + id);
-    }
-
-    public void removeReturnable(int id) {
-        sendSingleMessage("removeReturnable" + id);
+        sendAndReceive("removeEvent" + id);
     }
 
     public void removeTask(int id) {
-        sendSingleMessage("removeTask" + id);
+        sendAndReceive("removeTask" + id);
     }
 
     public void addEvent(Event event) {
         Log.e("DATA EVENT", "ADDING event" + event);
-        sendSingleMessage("addEvent" + new String(Helper.serializeWithLength(event)));
+        Helper.printArray(event.serialize());
+        sendByteMessage("addEvent", event.serialize());
     }
 
-    public void addReturnable(Returnable returnable) {
+    void addReturnable(Returnable returnable) {
         Log.e("DATA RETURNABLE", "ADDING returnable" + returnable);
-        sendSingleMessage("addReturnable" + new String(Helper.serializeWithLength(returnable)));
+        sendByteMessage("addReturnable", returnable.serialize());
     }
 
     public void addTask(Task task) {
         Log.e("DATA TASK", "ADDING TASK " + task);
-        sendSingleMessage("addTask" + new String(Helper.serializeWithLength(task)));
+        sendByteMessage("addTask", task.serialize());
     }
 
-    private void sendSingleMessage(String message) {
-        sendMessage(message, 0);
+    private void sendByteMessage(String message, byte[] data) {
+        Log.e("Wear", "Sending message: " + message);
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/bencarlisle");
+            DataMap dataMap = putDataMapRequest.getDataMap();
+            int id = getNextId();
+            dataMap.putInt("id", id);
+            dataMap.putBoolean("isResponse", false);
+            dataMap.putByteArray("message", message.getBytes());
+            dataMap.putByteArray("data", data);
+            Wearable.getDataClient(context).putDataItem(putDataMapRequest.asPutDataRequest());
+            if (receiveMessage(id) != null) {
+                return;
+            }
+        }
+        showNoResponse(context);
     }
 
     private byte[] sendAndReceive(String message) {
-        int id = new Random().nextInt();
-        Log.e("Wear", "Sending and receiving message: " + message + ":" + id);
-        sendMessage(message, id);
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            int id = getNextId();
+            Log.e("Wear", "Sending and receiving message: " + message + ":" + id);
+            sendMessage(message, id);
+            byte[] response = receiveMessage(id);
+            if (response != null) {
+                return response;
+            }
+        }
+        showNoResponse(context);
+        return null;
+    }
+
+    private byte[] receiveMessage(int id) {
         long startTime = Calendar.getInstance().getTimeInMillis();
-        while (!messageHandler.hasMessage(id) && Calendar.getInstance().getTimeInMillis() - startTime < 5000) {
+        while (!messageHandler.hasMessage(id) && Calendar.getInstance().getTimeInMillis() - startTime < 1000) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -119,11 +125,7 @@ public class SharedDataControl {
             }
         }
         Log.e("Wear", "Getting message " + id);
-        byte[] response = messageHandler.getMessage(id);
-        if (response == null) {
-            Log.e("Wear", "No response detected");
-        }
-        return response;
+        return messageHandler.getMessage(id);
     }
 
     private void sendMessage(String message, int id) {
@@ -134,5 +136,15 @@ public class SharedDataControl {
         dataMap.putBoolean("isResponse", false);
         dataMap.putByteArray("message", message.getBytes());
         Wearable.getDataClient(context).putDataItem(putDataMapRequest.asPutDataRequest());
+    }
+
+    private void showNoResponse(final Context context) {
+        Log.e("Wear", "No response detected");
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> Toast.makeText(context, "No response detected", Toast.LENGTH_SHORT).show());
+    }
+
+    private synchronized static int getNextId() {
+        return ID++;
     }
 }

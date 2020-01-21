@@ -44,7 +44,7 @@ class ReturnablesHandler extends ReturnablesModel {
     }
 
     private void addReturnablesViewRunnable(Returnable returnable) {
-        View returnableView = activity.getLayoutInflater().inflate(R.layout.returnable, null);
+        View returnableView = View.inflate(activity, R.layout.returnable, null);
         ((TextView) returnableView.findViewById(R.id.description)).setText(returnable.getEvent().getDescription());
         ((TextView) returnableView.findViewById(R.id.days)).setText(returnable.getDaysString());
         ((TextView) returnableView.findViewById(R.id.start_time)).setText(Helper.convertTimeToString(returnable.getEvent().getStartTime()));

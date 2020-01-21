@@ -32,8 +32,12 @@ public class Event implements Comparable<Event>, Serializable {
         this.taskId = taskId;
     }
 
-    public Event(byte[] message) {
-        this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+    public Event(byte[] message, boolean needsId) {
+        if (needsId) {
+            this.id = EVENT_ID++;
+        } else {
+            this.id = (int) Helper.readLongFromBytes(message, 4, 0);
+        }
         long startTime = Helper.readLongFromBytes(message, 8, 4);
         long endTime = Helper.readLongFromBytes(message, 8, 12);
         this.taskId = (int) Helper.readLongFromBytes(message, 4, 20);

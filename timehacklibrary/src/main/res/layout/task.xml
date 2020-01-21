@@ -10,6 +10,7 @@
     <TextView
         android:id="@+id/description"
         android:layout_width="0dp"
+        android:textColor="@android:color/black"
         android:layout_weight="3"
         android:layout_height="wrap_content" />
 
@@ -17,9 +18,8 @@
         android:id="@+id/due_date"
         android:layout_width="0dp"
         android:layout_weight="2"
-        android:gravity="end"
-        android:paddingStart="5dp"
-        android:paddingEnd="15dp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
         android:background="@drawable/border_sides"
         android:layout_height="wrap_content" />
 
@@ -27,9 +27,8 @@
         android:id="@+id/hours_left"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:gravity="end"
-        android:paddingStart="5dp"
-        android:paddingEnd="15dp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
         android:background="@drawable/border_right"
         android:layout_height="wrap_content" />
 
@@ -37,9 +36,8 @@
         android:id="@+id/task_priority"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:gravity="end"
-        android:paddingStart="5dp"
-        android:paddingEnd="15dp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
         android:background="@drawable/border_right"
         android:layout_height="wrap_content" />
 </LinearLayout>

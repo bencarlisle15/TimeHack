@@ -1,27 +1,28 @@
-package com.bencarlisle.timehack.day;
+package com.bencarlisle.timehack.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.day.DayActivity;
 import com.bencarlisle.timehack.main.WearVoiceActivity;
-import com.bencarlisle.timehack.tasks.TasksActivity;
 import com.bencarlisle.timelibrary.main.GeneralActivity;
-import com.bencarlisle.timelibrary.R;
 
-public class DayActivity extends GeneralActivity {
-    private transient CalendarControl calendar;
+public class TasksActivity extends GeneralActivity {
+
+    private TasksHandler tasksHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_day);
-        calendar = new CalendarControl(this);
+        setContentView(R.layout.main_tasks_layout);
+        tasksHandler = new TasksHandler(this);
     }
 
-    public void deleteEvent(View view) {
-        calendar.deleteEvent(view);
+    public void deleteTask(View view) {
+        tasksHandler.deleteTask(view.getId());
     }
 
     @Override
@@ -31,7 +32,7 @@ public class DayActivity extends GeneralActivity {
                 startActivity(new Intent(this, WearVoiceActivity.class));
                 return true;
             } else if (keyCode == KeyEvent.KEYCODE_STEM_2) {
-                startActivity(new Intent(this, TasksActivity.class));
+                startActivity(new Intent(this, DayActivity.class));
                 return true;
             }
         }

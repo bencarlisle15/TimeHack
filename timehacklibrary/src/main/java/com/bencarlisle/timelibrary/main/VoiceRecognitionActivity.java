@@ -56,7 +56,7 @@ public class VoiceRecognitionActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private String checkAndParseResult(String result) {
+    protected String checkAndParseResult(String result) {
         Event event = Parser.parseEventResult(result);
         if (event != null) {
             new DataControl(this).addEvent(event);

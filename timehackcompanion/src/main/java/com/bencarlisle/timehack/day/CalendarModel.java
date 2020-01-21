@@ -39,6 +39,9 @@ public abstract class CalendarModel implements Pollable {
     public synchronized void poll() {
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
+            if (newEvents == null) {
+                return;
+            }
             for (Event event : newEvents) {
                 if (!events.contains(event)) {
                     Log.e("EVENT FOUND", event.toString());

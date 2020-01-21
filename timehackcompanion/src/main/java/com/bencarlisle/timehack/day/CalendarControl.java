@@ -52,7 +52,7 @@ class CalendarControl extends CalendarModel {
     }
 
     private void addEventViewToCalendarRunnable(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
-        LinearLayout newEvent= (LinearLayout) activity.getLayoutInflater().inflate(R.layout.calendar_event, null);
+        LinearLayout newEvent= (LinearLayout) View.inflate(activity, R.layout.calendar_event, null);
         TextView newDescription = newEvent.findViewById(R.id.event_text);
         TextView spacer = newEvent.findViewById(R.id.event_spacer);
         newDescription.setTextSize(newDescriptionTextSize);

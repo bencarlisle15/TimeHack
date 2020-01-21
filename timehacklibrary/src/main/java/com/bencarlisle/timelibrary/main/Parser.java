@@ -8,10 +8,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Parser {
+public class Parser {
 
-    static Event parseEventResult(String result) {
-        Matcher matcher = Pattern.compile("^(from )?(\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) to (\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
+    public static Event parseEventResult(String result) {
+        Matcher matcher = Pattern.compile("^([fF]rom )?(\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) [tT]o (\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
         }
@@ -33,7 +33,7 @@ class Parser {
         return new Event(startTime, endTime, description, -1);
     }
 
-    static Task parseTaskResult(String str) {
+    public static Task parseTaskResult(String str) {
         Matcher matcher = Pattern.compile("^add (.+) (due|to|do) ([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] with (\\d{1,2}) hours and priority (\\d)$").matcher(str);
         if (!matcher.find()) {
             return null;
@@ -100,7 +100,7 @@ class Parser {
         return calendar;
     }
 
-    static Returnable parseReturnableResult(String result) {
+    public static Returnable parseReturnableResult(String result) {
         Matcher matcher = Pattern.compile("^([a-zA-Z ]+) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;

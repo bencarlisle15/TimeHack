@@ -11,18 +11,18 @@
             android:text="@string/day_calendar"
             android:onClick="dayCalendar" />
 
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="@string/returnables"-->
-<!--            android:layout_centerHorizontal="true"-->
-<!--            android:onClick="returnables" />-->
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/returnables"
+            android:layout_centerHorizontal="true"
+            android:onClick="returnables" />
 
-<!--        <Button-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="@string/tasks"-->
-<!--            android:layout_alignParentEnd="true"-->
-<!--            android:onClick="tasks"-->
-<!--            tools:ignore="RelativeOverlap" />-->
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tasks"
+            android:layout_alignParentEnd="true"
+            android:onClick="tasks"
+            tools:ignore="RelativeOverlap" />
 </RelativeLayout>

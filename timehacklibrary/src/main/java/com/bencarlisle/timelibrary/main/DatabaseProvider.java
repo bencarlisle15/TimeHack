@@ -1,5 +1,6 @@
 package com.bencarlisle.timelibrary.main;
 
+import androidx.annotation.NonNull;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -10,14 +11,14 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class DatabaseProvider extends ContentProvider {
-    static final String PROVIDER_NAME = "com.bencarlisle.timehack.main.MyProvider";
-    static final String URL = "content://" + PROVIDER_NAME + "/bencarlisle";
+    private static final String PROVIDER_NAME = "com.bencarlisle.timehack.main.MyProvider";
+    private static final String URL = "content://" + PROVIDER_NAME + "/bencarlisle";
     public static final Uri CONTENT_URI = Uri.parse(URL);
 
 
     private DataControl db = null;
-    static final int uriCode = 1;
-    static final UriMatcher uriMatcher;
+    private static final int uriCode = 1;
+    private static final UriMatcher uriMatcher;
     private static HashMap<String, String> values;
 
     static {
@@ -27,7 +28,7 @@ public class DatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (uriMatcher.match(uri) == uriCode) {
             switch (selection) {
                 case "events":
@@ -58,12 +59,12 @@ public class DatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         String tableName = values.getAsString("tableName");
         int id = values.getAsInteger("id");
         String description = values.getAsString("description");
@@ -101,12 +102,12 @@ public class DatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return db.rawQuery(selection);
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
 }

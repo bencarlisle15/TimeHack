@@ -33,6 +33,12 @@ public class Organizer extends IntentService {
     }
 
     private void runAlarm() {
+        DataControl dataControl = new DataControl(this);
+        boolean isAlreadyRun = dataControl.isAlreadyRun();
+        dataControl.close();
+        if (!isAlreadyRun) {
+            runTaskAdder();
+        }
         while (true) {
             try {
                 Thread.sleep(getMillisToMidnight());
@@ -83,8 +89,7 @@ public class Organizer extends IntentService {
 //                unAddedTasks.add(task);
             }
         }
-
-
+        dataControl.runOrganizer();
         dataControl.close();
     }
 
