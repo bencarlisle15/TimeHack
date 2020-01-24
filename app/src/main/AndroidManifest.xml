@@ -12,7 +12,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <receiver android:name=".main.StartWidget">
             <intent-filter>
@@ -32,7 +31,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/tasks_widget_info" />
         </receiver>
-        <receiver android:name=".day.DayWidget">
+        <receiver android:name=".events.EventsWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -43,14 +42,14 @@
         </receiver>
 
         <service
-            android:name=".day.TimeViewsService"
+            android:name=".events.TimeViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service
             android:name=".tasks.TasksViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
-            android:name="com.bencarlisle.timelibrary.main.Organizer"
+            android:name=".main.Organizer"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
@@ -65,18 +64,18 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/bencarlisle" />
             </intent-filter>
         </service>
-        <activity android:name="com.bencarlisle.timelibrary.main.MainActivity">
+        <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.bencarlisle.timelibrary.day.DayActivity" />
-        <activity android:name="com.bencarlisle.timelibrary.returnables.ReturnablesActivity" />
-        <activity android:name="com.bencarlisle.timelibrary.tasks.TasksActivity" />
+        <activity android:name=".events.EventsActivity" />
+        <activity android:name=".returnables.ReturnablesActivity" />
+        <activity android:name=".tasks.TasksActivity" />
         <activity
-            android:name="com.bencarlisle.timelibrary.main.VoiceRecognitionActivity"
+            android:name=".main.AppVoiceRecognitionActivity"
             android:label="speech" />
     </application>
 

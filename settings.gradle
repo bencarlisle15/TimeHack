@@ -1,2 +1,2 @@
-include ':app', ':timehackcompanion', ':timehacklibrary'
+include ':app', ':wear', ':shared', ':widget'
 rootProject.name='TimeHack'

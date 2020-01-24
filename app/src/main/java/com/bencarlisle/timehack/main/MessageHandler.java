@@ -2,7 +2,6 @@ package com.bencarlisle.timehack.main;
 
 import android.util.Log;
 
-import com.bencarlisle.timelibrary.main.DataControl;
 import com.bencarlisle.timelibrary.main.Event;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Returnable;
@@ -46,7 +45,7 @@ public class MessageHandler extends WearableListenerService {
         dataMap.putBoolean("isResponse", true);
         dataMap.putByteArray("message", response);
         Wearable.getDataClient(this).putDataItem(putDataMapRequest.asPutDataRequest());
-        Log.e("App", "Send message " + id);
+        Log.e("App", "Sending response for " + id);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

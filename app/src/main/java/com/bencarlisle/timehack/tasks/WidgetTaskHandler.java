@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Task;
 import com.bencarlisle.timelibrary.tasks.TasksModel;
@@ -17,11 +18,11 @@ class WidgetTaskHandler extends TasksModel {
     private Context context;
 
     WidgetTaskHandler(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        super(context);
+        super(new DataControl(context));
         this.context = context;
         this.appWidgetManager = appWidgetManager;
         this.appWidgetId = appWidgetId;
-        start();
+        startPolling(1);
     }
 
     public void deleteTask(int id) {
