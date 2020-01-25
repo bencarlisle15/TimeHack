@@ -1,9 +1,13 @@
 package com.bencarlisle.timehack.main;
 
-import android.app.IntentService;
+import android.app.job.JobInfo;
+import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-
-import androidx.annotation.Nullable;
+import android.util.Log;
 
 import com.bencarlisle.timelibrary.main.Event;
 import com.bencarlisle.timelibrary.main.Returnable;
@@ -12,10 +16,11 @@ import com.bencarlisle.timelibrary.main.Task;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-public class Organizer extends IntentService implements Runnable {
+public class Organizer extends JobService {
 
     private static boolean isStarted = false;
     private final static int RECOMMENDED_START = 10;
@@ -23,41 +28,53 @@ public class Organizer extends IntentService implements Runnable {
     private final static float TIME_BUFFER = 10;
     private final static float TIME_BUFFER_HOURS = TIME_BUFFER / 60.0f;
 
-    public Organizer() {
-        super("Organizer");
-        if (!isStarted) {
-            isStarted = true;
-            new Thread(this).start();
-        }
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        runTaskAdder(this);
+        return false;
     }
 
-    @SuppressWarnings("InfiniteLoopStatement")
-    public void run() {
-        testRunAdder();
-        DataControl dataControl = new DataControl(this);
-        boolean isAlreadyRun = dataControl.isAlreadyRun();
-        dataControl.close();
-        if (!isAlreadyRun) {
-            runTaskAdder();
-        }
-        while (true) {
-            try {
-                Thread.sleep(getMillisToMidnight());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            runTaskAdder();
-        }
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        return false;
     }
 
-    private void testRunAdder() {
+    public void startScheduler(Context context) {
+        if (isStarted) {
+            return;
+        }
+        isStarted = true;
+//        DataControl dataControl = new DataControl(context);
+//        boolean isAlreadyRun = dataControl.isAlreadyRun();
+//        dataControl.close();
+//        if (!isAlreadyRun) {
+//            runTaskAdder(context);
+//            return;
+//        }
+        schedule(context);
+    }
+
+    private void schedule(Context context) {
+        ComponentName serviceComponent = new ComponentName(context, Organizer.class);
+        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
+        builder.setMinimumLatency(10000);
+        builder.setOverrideDeadline(30000);
+        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+        Objects.requireNonNull(jobScheduler).schedule(builder.build());
+    }
+
+    public void runNow() {
+
+    }
+
+    private void testRunAdder(Context context) {
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            DataControl dataControl = new DataControl(this);
+            DataControl dataControl = new DataControl(context);
             dataControl.reboot();
             Calendar startTime = Calendar.getInstance();
             startTime.set(Calendar.HOUR_OF_DAY, 10);
@@ -75,11 +92,12 @@ public class Organizer extends IntentService implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        runTaskAdder();
+        runTaskAdder(context);
     }
 
-    private void runTaskAdder() {
-        DataControl dataControl = new DataControl(this);
+    private void runTaskAdder(Context context) {
+        Log.e("Organizer", "Running task adder");
+        DataControl dataControl = new DataControl(context);
         for (Event event: dataControl.getTaskEvents()) {
             dataControl.addTaskHours(event.getTaskId(), getHoursBetween(event.getStartTime(), event.getEndTime()));
         }
@@ -119,9 +137,10 @@ public class Organizer extends IntentService implements Runnable {
         }
         dataControl.runOrganizer();
         dataControl.close();
+        schedule(context);
     }
 
-    private Event findSpot(TreeSet<Event> events, Task task, Calendar start, Calendar end) {
+    private static Event findSpot(TreeSet<Event> events, Task task, Calendar start, Calendar end) {
         float nextHours = task.getNextHours();
         if (events.size() == 0 || getHoursBetween(start, events.first().getStartTime()) > TIME_BUFFER_HOURS + nextHours) {
             return createEvent(start, nextHours, task);
@@ -153,7 +172,7 @@ public class Organizer extends IntentService implements Runnable {
         return null;
     }
 
-    private Event createEvent(Calendar time, float nextHours, Task task) {
+    private static Event createEvent(Calendar time, float nextHours, Task task) {
         Calendar start = Calendar.getInstance();
         start.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
         start.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
@@ -166,12 +185,12 @@ public class Organizer extends IntentService implements Runnable {
         return new Event(start, end, task.getDescription(), task.getId());
     }
 
-    private float getHoursBetween(Calendar start, Calendar end) {
+    private static float getHoursBetween(Calendar start, Calendar end) {
         long millisDifference = end.getTimeInMillis() - start.getTimeInMillis();
         return (float) TimeUnit.MILLISECONDS.toHours(millisDifference);
     }
 
-    private long getMillisToMidnight() {
+    private static long getMillisToMidnight() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DATE, 1);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -185,22 +204,21 @@ public class Organizer extends IntentService implements Runnable {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         onTaskRemoved(intent);
+        Log.e("ON", "Stat4edD");
         return START_STICKY;
     }
 
-    @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        if (!isStarted) {
-            isStarted = true;
-            new Thread(this).start();
-        }
-    }
+//    @Override
+//    protected void onHandleIntent(@Nullable Intent intent) {
+//        if (!isStarted) {
+//            isStarted = true;
+//            new Thread(this).start();
+//        }
+//    }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Intent restartServiceIntent = new Intent(getApplicationContext(),this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-        startService(restartServiceIntent);
+        Log.e("RASK", "REMOVED");
         super.onTaskRemoved(rootIntent);
     }
 }

@@ -10,7 +10,7 @@ public class MainActivity extends GeneralActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startService(new Intent(this, Organizer.class));
+        new Organizer().startScheduler(this);
         setContentView(R.layout.activity_main);
     }
 }
