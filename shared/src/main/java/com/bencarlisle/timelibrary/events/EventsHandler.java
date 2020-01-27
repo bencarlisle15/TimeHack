@@ -1,6 +1,7 @@
 package com.bencarlisle.timelibrary.events;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import com.bencarlisle.timelibrary.R;
 import com.bencarlisle.timelibrary.main.DataControllable;
 import com.bencarlisle.timelibrary.main.Event;
+import com.bencarlisle.timelibrary.main.EventAlarmManager;
 
 public class EventsHandler extends EventsModel {
     private EventsAdapter adapter;
@@ -29,12 +31,13 @@ public class EventsHandler extends EventsModel {
     }
 
     protected void deleteEvent(int id) {
-        activity.runOnUiThread(() -> {
+       activity.runOnUiThread(() -> {
             synchronized (events) {
                 dataControl.removeEvent(id);
                 for (int i = 0; i < events.size(); i++) {
                     if (events.get(i).getId() == id) {
                         adapter.removeView(i);
+                        EventAlarmManager.removeAlarm(context, events.get(i));
                         events.remove(i);
                         break;
                     }
@@ -44,6 +47,7 @@ public class EventsHandler extends EventsModel {
     }
 
     protected void addEventViewToCalendar(int height, int width, int spacerHeight, int newDescriptionTextSize, Event event) {
+        EventAlarmManager.addAlarm(activity, event);
         activity.runOnUiThread(() -> addEventViewToCalendarRunnable(height, width, spacerHeight, newDescriptionTextSize, event));
     }
 

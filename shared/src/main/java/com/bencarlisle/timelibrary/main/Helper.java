@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class Helper {
 
@@ -129,5 +130,10 @@ public class Helper {
         byte[] serialized = serializable.serialize();
         Helper.writeBytesToBytes(message, serialized, 4);
         return message;
+    }
+
+    static long millisUntil(Calendar time) {
+        Log.e("DIFFERENCE IS", time.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + " millis");
+        return time.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
     }
 }

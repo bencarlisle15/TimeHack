@@ -21,6 +21,7 @@ class EventsAdapter implements ListAdapter {
 
     public void addView(View view) {
         if (deleteNext) {
+            //view deleted before it was added
             deleteNext = false;
         } else {
             numberOfViews++;
@@ -33,6 +34,7 @@ class EventsAdapter implements ListAdapter {
             calendar.removeViewAt(index + 1);
             numberOfViews--;
         } else {
+            //view not yet added
             deleteNext = true;
         }
     }
@@ -44,69 +46,55 @@ class EventsAdapter implements ListAdapter {
 
     @Override
     public void registerDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void unregisterDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
         return 1;
     }
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
         return 1;
     }
 
     @Override
     public boolean hasStableIds() {
-        // TODO Auto-generated method stub
         return false;
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int getViewTypeCount() {
-        // TODO Auto-generated method stub
         return 1;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean areAllItemsEnabled() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isEnabled(int position) {
-        // TODO Auto-generated method stub
         return false;
-
     }
 }

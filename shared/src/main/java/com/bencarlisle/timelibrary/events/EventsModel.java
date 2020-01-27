@@ -69,10 +69,10 @@ public abstract class EventsModel implements Pollable {
                 e.printStackTrace();
             }
             Calendar time = Calendar.getInstance();
-            time.set(Calendar.HOUR_OF_DAY, 3);
-            time.set(Calendar.MINUTE, 0);
+            time.set(Calendar.HOUR_OF_DAY, 23);
+            time.set(Calendar.MINUTE, 5);
             Calendar endTime = Calendar.getInstance();
-            endTime.set(Calendar.HOUR_OF_DAY, 3);
+            endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 45);
             addEvent(new Event(time, endTime, "HELLO FRIEND", -1));
         }).start();

@@ -57,8 +57,8 @@ public class Organizer extends JobService {
     private void schedule(Context context) {
         ComponentName serviceComponent = new ComponentName(context, Organizer.class);
         JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setMinimumLatency(10000);
-        builder.setOverrideDeadline(30000);
+        builder.setMinimumLatency(getMillisToMidnight());
+        builder.setOverrideDeadline(getMillisTo6());
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
         Objects.requireNonNull(jobScheduler).schedule(builder.build());
     }
@@ -198,7 +198,16 @@ public class Organizer extends JobService {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
-//        return 10000;
+    }
+
+    private static long getMillisTo6() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, 1);
+        c.set(Calendar.HOUR_OF_DAY, 6);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
     }
 
     @Override
