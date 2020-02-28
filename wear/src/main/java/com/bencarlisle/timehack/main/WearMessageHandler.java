@@ -1,7 +1,6 @@
 package com.bencarlisle.timehack.main;
 
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -11,9 +10,11 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.ArrayList;
+
 public class WearMessageHandler extends WearableListenerService {
 
-    private static SparseArray<byte[]> messages = new SparseArray<>();
+    private static ArrayList<Integer> messages = new ArrayList<>();
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
@@ -25,23 +26,22 @@ public class WearMessageHandler extends WearableListenerService {
                     continue;
                 }
                 Log.e("Wear", "Received new message: " + dataMap.getInt("id"));
-                messages.put(dataMap.getInt("id"), dataMap.getByteArray("message"));
+                messages.add(dataMap.getInt("id"));
                 Wearable.getDataClient(this).deleteDataItems(item.getUri());
             }
         }
     }
 
     public boolean hasMessage(int id) {
-        return messages.indexOfKey(id) != -1;
+        return messages.contains(id);
     }
 
-    public byte[] getMessage(int id) {
+    public boolean getMessage(int id) {
         if (hasMessage(id)) {
-            byte[] message = messages.get(id);
-            messages.remove(id);
-            return message;
+            messages.remove((Integer) id);
+            return true;
         }
-        return null;
+        return false;
 
     }
 }

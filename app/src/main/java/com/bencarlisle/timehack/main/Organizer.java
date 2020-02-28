@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.bencarlisle.timelibrary.main.Event;
+import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Returnable;
 import com.bencarlisle.timelibrary.main.Task;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,10 +65,6 @@ public class Organizer extends JobService {
         Objects.requireNonNull(jobScheduler).schedule(builder.build());
     }
 
-    public void runNow() {
-
-    }
-
     private void testRunAdder(Context context) {
         new Thread(() -> {
             try {
@@ -82,7 +80,7 @@ public class Organizer extends JobService {
             Calendar endTime = Calendar.getInstance();
             endTime.set(Calendar.HOUR_OF_DAY, 12);
             endTime.set(Calendar.MINUTE, 0);
-            dataControl.addReturnable(new Returnable(new boolean[]{true, true, true, true, true, true, true}, new Event(startTime, endTime, "Returnable", -1)));
+            dataControl.addReturnable(new Returnable(new boolean[]{true, true, true, true, true, true, true}, Helper.getEvent(startTime, endTime, "Returnable", -1)));
             Calendar dueDate = Calendar.getInstance();
             dueDate.add(Calendar.DATE, 1);
             dataControl.addTask(new Task(dueDate,  "Task", 5, 10, 0));
@@ -99,13 +97,13 @@ public class Organizer extends JobService {
         Log.e("Organizer", "Running task adder");
         DataControl dataControl = new DataControl(context);
         for (Event event: dataControl.getTaskEvents()) {
-            dataControl.addTaskHours(event.getTaskId(), getHoursBetween(event.getStartTime(), event.getEndTime()));
+            dataControl.addTaskHours(Integer.parseInt(event.getDescription()), getHoursBetween(event.getStart(), event.getEnd()));
         }
         dataControl.cleanTasks();
-        dataControl.clearEvents();
+//        dataControl.clearEvents();
         int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
         ArrayList<Returnable> returnables = dataControl.getReturnablesOnDay(day);
-        TreeSet<Event> events = new TreeSet<>();
+        TreeSet<Event> events = new TreeSet<>((e1, e2) -> (int) (e1.getStart().getDateTime().getValue() - e2.getStart().getDateTime().getValue()));
 
         for (Returnable returnable: returnables) {
             dataControl.addEvent(returnable.getEvent());
@@ -142,7 +140,7 @@ public class Organizer extends JobService {
 
     private static Event findSpot(TreeSet<Event> events, Task task, Calendar start, Calendar end) {
         float nextHours = task.getNextHours();
-        if (events.size() == 0 || getHoursBetween(start, events.first().getStartTime()) > TIME_BUFFER_HOURS + nextHours) {
+        if (events.size() == 0 || getHoursBetween(start, Helper.getCalendar(events.first().getStart())) > TIME_BUFFER_HOURS + nextHours) {
             return createEvent(start, nextHours, task);
         }
         Event lastEvent = events.first();
@@ -151,14 +149,14 @@ public class Organizer extends JobService {
 
         while (eventIterator.hasNext()) {
             Event event = eventIterator.next();
-            if (getHoursBetween(lastEvent.getEndTime(), event.getStartTime()) > TIME_BUFFER_HOURS + nextHours) {
-                return createEvent(lastEvent.getEndTime(), nextHours, task);
+            if (getHoursBetween(lastEvent.getEnd(), event.getStart()) > TIME_BUFFER_HOURS + nextHours) {
+                return createEvent(Helper.getCalendar(lastEvent.getEnd()), nextHours, task);
             }
             lastEvent = event;
         }
 
-        if (getHoursBetween(lastEvent.getEndTime(), end) > TIME_BUFFER_HOURS + nextHours) {
-            return createEvent(lastEvent.getEndTime(), nextHours, task);
+        if (getHoursBetween(Helper.getCalendar(lastEvent.getEnd()), end) > TIME_BUFFER_HOURS + nextHours) {
+            return createEvent(Helper.getCalendar(lastEvent.getEnd()), nextHours, task);
         }
         if (task.getDaysLeft() == 1 || nextHours > 2 || task.getPriority() > 3) {
             Calendar startTime = Calendar.getInstance();
@@ -182,10 +180,17 @@ public class Organizer extends JobService {
         end.set(Calendar.MINUTE, start.get(Calendar.MINUTE));
         end.add(Calendar.HOUR_OF_DAY, (int) nextHours);
         end.add(Calendar.MINUTE, (int) Math.ceil(60 * (nextHours % 1)));
-        return new Event(start, end, task.getDescription(), task.getId());
+        return Helper.getEvent(start, end, task.getDescription(), task.getId());
     }
 
     private static float getHoursBetween(Calendar start, Calendar end) {
+        long millisDifference = end.getTimeInMillis() - start.getTimeInMillis();
+        return (float) TimeUnit.MILLISECONDS.toHours(millisDifference);
+    }
+
+    private static float getHoursBetween(EventDateTime startTime, EventDateTime endTime) {
+        Calendar start = Helper.getCalendar(startTime);
+        Calendar end = Helper.getCalendar(endTime);
         long millisDifference = end.getTimeInMillis() - start.getTimeInMillis();
         return (float) TimeUnit.MILLISECONDS.toHours(millisDifference);
     }
@@ -227,7 +232,7 @@ public class Organizer extends JobService {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.e("RASK", "REMOVED");
+        Log.e("TASK", "REMOVED");
         super.onTaskRemoved(rootIntent);
     }
 }

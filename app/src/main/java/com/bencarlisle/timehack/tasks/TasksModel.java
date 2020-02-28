@@ -1,8 +1,8 @@
-package com.bencarlisle.timelibrary.tasks;
+package com.bencarlisle.timehack.tasks;
 
 import android.util.Log;
 
-import com.bencarlisle.timelibrary.main.DataControllable;
+import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timelibrary.main.Merger;
 import com.bencarlisle.timelibrary.main.Pollable;
 import com.bencarlisle.timelibrary.main.Task;
@@ -13,13 +13,13 @@ import java.util.Calendar;
 public abstract class TasksModel implements Pollable {
 
     protected final ArrayList<Task> tasks = new ArrayList<>();
-    protected DataControllable dataControl;
+    protected DataControl dataControl;
     private Merger merger;
 
     protected abstract void addTaskView(Task task);
     protected abstract void deleteTask(int id);
 
-    protected TasksModel(DataControllable dataControl) {
+    protected TasksModel(DataControl dataControl) {
         this.dataControl = dataControl;
     }
 

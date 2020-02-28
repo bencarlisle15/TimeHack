@@ -6,7 +6,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bencarlisle.timehack.R;
-import com.bencarlisle.timelibrary.main.DataControllable;
+import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Returnable;
 import com.bencarlisle.timelibrary.main.ViewAdapter;
@@ -16,8 +16,8 @@ public class ReturnablesHandler extends ReturnablesModel {
     private ViewAdapter viewAdapter;
     private Activity activity;
 
-    public ReturnablesHandler(DataControllable dataControllable, Activity activity) {
-        super(dataControllable);
+    public ReturnablesHandler(DataControl dataControl, Activity activity) {
+        super(dataControl);
         this.activity = activity;
         viewAdapter = new ViewAdapter(activity, R.id.returnables);
         ((ListView) activity.findViewById(R.id.returnables)).setAdapter(viewAdapter);
@@ -46,10 +46,10 @@ public class ReturnablesHandler extends ReturnablesModel {
 
     private void addReturnablesViewRunnable(Returnable returnable) {
         View returnableView = View.inflate(activity, R.layout.returnable, null);
-        ((TextView) returnableView.findViewById(R.id.description)).setText(returnable.getEvent().getDescription());
+        ((TextView) returnableView.findViewById(R.id.description)).setText(returnable.getEvent().getSummary());
         ((TextView) returnableView.findViewById(R.id.days)).setText(returnable.getDaysString());
-        ((TextView) returnableView.findViewById(R.id.start_time)).setText(Helper.convertTimeToString(returnable.getEvent().getStartTime()));
-        ((TextView) returnableView.findViewById(R.id.end_time)).setText(Helper.convertTimeToString(returnable.getEvent().getEndTime()));
+        ((TextView) returnableView.findViewById(R.id.start_time)).setText(Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getStart())));
+        ((TextView) returnableView.findViewById(R.id.end_time)).setText(Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getEnd())));
         returnableView.setId(returnable.getId());
         viewAdapter.add(returnableView);
     }

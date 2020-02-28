@@ -2,11 +2,12 @@ package com.bencarlisle.timehack.returnables;
 
 import android.util.Log;
 
-import com.bencarlisle.timelibrary.main.DataControllable;
-import com.bencarlisle.timelibrary.main.Event;
+import com.bencarlisle.timehack.main.DataControl;
+import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Merger;
 import com.bencarlisle.timelibrary.main.Pollable;
 import com.bencarlisle.timelibrary.main.Returnable;
+import com.google.api.services.calendar.model.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,12 +15,12 @@ import java.util.Calendar;
 abstract class ReturnablesModel implements Pollable {
 
     final ArrayList<Returnable> returnables = new ArrayList<>();
-    DataControllable dataControl;
+    DataControl dataControl;
 
     protected abstract void addReturnableView(Returnable returnable);
     protected abstract void deleteReturnable(int id);
 
-    ReturnablesModel(DataControllable dataControl) {
+    ReturnablesModel(DataControl dataControl) {
         this.dataControl = dataControl;
     }
 
@@ -60,7 +61,7 @@ abstract class ReturnablesModel implements Pollable {
             Calendar endTime = Calendar.getInstance();
             endTime.set(Calendar.HOUR_OF_DAY, 3);
             endTime.set(Calendar.MINUTE, 45);
-            Event event = new Event(time, endTime, "HELLO FRIEND", -1);
+            Event event = Helper.getEvent(time, endTime, "HELLO FRIEND", -1);
             boolean[] days = new boolean[]{false,true,false,true,false,true,false};
             addReturnable(new Returnable(days, event));
         }).start();

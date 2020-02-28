@@ -6,7 +6,6 @@ import android.view.View;
 import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timehack.R;
 import com.bencarlisle.timehack.main.GeneralActivity;
-import com.bencarlisle.timelibrary.tasks.TasksHandler;
 
 public class TasksActivity extends GeneralActivity {
 

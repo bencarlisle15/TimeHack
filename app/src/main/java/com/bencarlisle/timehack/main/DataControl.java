@@ -7,9 +7,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.bencarlisle.timelibrary.main.DataControllable;
-import com.bencarlisle.timelibrary.main.Event;
+import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Returnable;
 import com.bencarlisle.timelibrary.main.Task;
+import com.google.api.services.calendar.model.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,20 +25,19 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         setIds();
     }
 
+    void setToken(String token) {
+        if (getToken() == null) {
+            db.execSQL("INSERT INTO Token VALUES ('" + token + "');");
+        } else {
+            db.execSQL("UPDATE Token SET token=" + token + ";");
+        }
+    }
+
     private void setIds() {
-        Event.setEventId(getNextEventId());
         Returnable.setReturnableId(getNextReturnableId());
         Task.setTaskId(getNextTaskId());
     }
 
-    void clearEvents() {
-        db.execSQL("DELETE FROM Calendar;");
-    }
-
-    public ArrayList<Event> getEvents() {
-        Cursor cursor = db.rawQuery("SELECT * FROM Calendar;",null);
-        return getEvents(cursor);
-    }
 
     public ArrayList<Returnable> getReturnables() {
         Cursor cursor = db.rawQuery("SELECT * FROM Returnables;",null);
@@ -66,17 +66,11 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Calendar (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
-        db.execSQL("CREATE TABLE Returnables (id INTEGER UNIQUE PRIMARY KEY NOT NULL, days TEXT NOT NULL, eventId INTEGER NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("CREATE TABLE Token (token VARCHAR(256) UNIQUE PRIMARY KEY NOT NULL)");
+        db.execSQL("CREATE TABLE Returnables (id INTEGER UNIQUE PRIMARY KEY NOT NULL, days TEXT NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Tasks (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, dueDate BIGINTEGER NOT NULL, priority INTEGER, hoursRequired FLOAT, hoursCompleted FLOAT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Organized (lastDay INTEGER NOT NULL)");
         db.execSQL("INSERT INTO Organized (lastDay) VALUES (-1)");
-    }
-
-    int getNextEventId() {
-        //sql injection is trivial
-        Cursor cursor = db.rawQuery(getSQL("getNextEventId", null), null);
-        return getNextId(cursor);
     }
 
     int getNextReturnableId() {
@@ -95,11 +89,13 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
     public void addEvent(Event event) {
         //sql injection is trivial
         Log.e("DATA EVENT", "Adding event " + event);
-        db.execSQL(getSQL("addEvent", event));
+        CalendarControl.addEvent(event, getToken());
     }
 
     public void addReturnable(Returnable returnable) {
         Log.e("DATA RETURNABLE", "ADDING returnable" + returnable);
+        Log.e("Ret", returnable.getEvent() + ":");
+        Log.e("end", returnable.getEvent().getStart().toString() + ":");
         db.execSQL(getSQL("addReturnable", returnable));
     }
 
@@ -113,8 +109,14 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         onUpgrade(db, 0,0);
     }
 
-    public void removeEvent(int id) {
-        db.execSQL(getSQL("removeEvent", id));
+    String getToken() {
+        Cursor cursor = db.rawQuery("SELECT token FROM Token;", null);
+        String token = null;
+        if (cursor.moveToFirst()) {
+            token = cursor.getString(cursor.getColumnIndex("token"));
+        }
+        cursor.close();
+        return token;
     }
 
     public void removeReturnable(int id) {
@@ -127,10 +129,10 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Calendar");
-        db.execSQL("DROP TABLE IF EXISTS Returnables");
-        db.execSQL("DROP TABLE IF EXISTS Tasks");
-        db.execSQL("DROP TABLE IF EXISTS Organized");
+        db.execSQL("DROP TABLE IF EXISTS Token;");
+        db.execSQL("DROP TABLE IF EXISTS Returnables;");
+        db.execSQL("DROP TABLE IF EXISTS Tasks;");
+        db.execSQL("DROP TABLE IF EXISTS Organized;");
         onCreate(db);
     }
 
@@ -141,12 +143,11 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String bitfield = cursor.getString(cursor.getColumnIndex("days"));
-                int eventId = cursor.getInt(cursor.getColumnIndex("eventId"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
                 long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
                 int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
-                Event event = new Event(eventId, description, startTime, endTime, taskId);
+                Event event = Helper.getEvent(Helper.initCalendar(startTime), Helper.initCalendar(endTime), description, taskId);
                 returnables.add(new Returnable(id, bitfield, event));
                 cursor.moveToNext();
             }
@@ -156,21 +157,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
     }
 
     ArrayList<Event> getTaskEvents() {
-        Cursor cursor = db.rawQuery("SELECT * FROM Calendar WHERE taskId != '-1';", null);
-        ArrayList<Event> events = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
-                String description = cursor.getString(cursor.getColumnIndex("description"));
-                long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
-                long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
-                int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
-                events.add(new Event(id, description, startTime, endTime, taskId));
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return events;
+        return CalendarControl.getTaskEvents(getToken());
     }
 
     void addTaskHours(int taskId, float hoursCompleted) {
@@ -181,22 +168,22 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         db.execSQL("DELETE FROM Tasks where hoursCompleted >= hoursRequired");
     }
 
-    private static ArrayList<Event> getEvents(Cursor cursor) {
-        ArrayList<Event> events = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
-                String description = cursor.getString(cursor.getColumnIndex("description"));
-                long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
-                long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
-                int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
-                events.add(new Event(id, description, startTime, endTime, taskId));
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return events;
-    }
+//    private static ArrayList<Event> getEvents(Cursor cursor) {
+//        ArrayList<Event> events = new ArrayList<>();
+//        if (cursor.moveToFirst()) {
+//            while (!cursor.isAfterLast()) {
+//                int id = cursor.getInt(cursor.getColumnIndex("id"));
+//                String description = cursor.getString(cursor.getColumnIndex("description"));
+//                long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
+//                long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
+//                int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
+//                events.add(new Event(id, description, startTime, endTime, taskId));
+//                cursor.moveToNext();
+//            }
+//        }
+//        cursor.close();
+//        return events;
+//    }
 
     private static ArrayList<Returnable> getReturnables(Cursor cursor) {
         ArrayList<Returnable> returnables = new ArrayList<>();
@@ -204,12 +191,11 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String bitfield = cursor.getString(cursor.getColumnIndex("days"));
-                int eventId = cursor.getInt(cursor.getColumnIndex("eventId"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
                 long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
                 int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
-                Event event = new Event(eventId, description, startTime, endTime, taskId);
+                Event event = Helper.getEvent(Helper.initCalendar(startTime), Helper.initCalendar(endTime), description, taskId);
                 returnables.add(new Returnable(id, bitfield, event));
                 cursor.moveToNext();
             }
@@ -249,24 +235,16 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
 
     private static String getSQL(String function, Object extra) {
         switch (function) {
-            case "getNextEventId":
-                return "SELECT id FROM Calendar ORDER BY id DESC;";
             case "getNextReturnableId":
                 return "SELECT id FROM Returnables ORDER BY id DESC;";
             case "getNextTaskId":
                 return "SELECT id FROM Tasks ORDER BY id DESC;";
-            case "addEvent":
-                Event event = (Event) extra;
-                return "INSERT INTO Calendar (id, description, startTime, endTime, taskId) VALUES ('" + event.getId() + "', '" + event.getDescription() + "', '" + event.getStartTime().getTimeInMillis() + "', '" + event.getEndTime().getTimeInMillis() + "', '" + event.getTaskId() + "');";
             case "addReturnable":
                 Returnable returnable = (Returnable) extra;
-                return "INSERT INTO Returnables (id, days, eventId, description, startTime, endTime, taskId) VALUES ('" + returnable.getId() + "', '" + returnable.getBitfield() + "', '" + returnable.getEvent().getId() + "', '" + returnable.getEvent().getDescription() + "', '" + returnable.getEvent().getStartTime().getTimeInMillis() + "', '" + returnable.getEvent().getEndTime().getTimeInMillis() + "', '" + returnable.getEvent().getTaskId() + "');";
+                return "INSERT INTO Returnables (id, days, description, startTime, endTime, taskId) VALUES ('" + returnable.getId() + "', '" + returnable.getBitfield() + "', '" + returnable.getEvent().getSummary() + "', '" + returnable.getEvent().getStart().getDateTime().getValue() + "', '" + returnable.getEvent().getEnd().getDateTime().getValue() + "', '" + returnable.getEvent().getDescription() + "');";
             case "addTask":
                 Task task = (Task) extra;
                 return "INSERT INTO Tasks (id, description, dueDate, priority, hoursRequired, hoursCompleted) VALUES ('" + task.getId() + "', '" + task.getDescription() + "', '" + task.getDueDate().getTimeInMillis() + "', '" + task.getPriority() + "', '" + task.getHoursRequired() + "', '" + task.getHoursCompleted() + "');";
-            case "removeEvent":
-                Integer eventId = (Integer) extra;
-                return "DELETE FROM Calendar WHERE id='" + eventId + "';";
             case "removeReturnable":
                 Integer returnableId = (Integer) extra;
                 return "DELETE FROM Returnables WHERE id='" + returnableId + "';";

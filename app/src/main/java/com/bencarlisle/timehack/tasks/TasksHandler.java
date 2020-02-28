@@ -1,12 +1,12 @@
-package com.bencarlisle.timelibrary.tasks;
+package com.bencarlisle.timehack.tasks;
 
 import android.app.Activity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bencarlisle.timelibrary.R;
-import com.bencarlisle.timelibrary.main.DataControllable;
+import com.bencarlisle.timehack.R;
+import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Task;
 import com.bencarlisle.timelibrary.main.ViewAdapter;
@@ -16,8 +16,8 @@ public class TasksHandler extends TasksModel {
     private ViewAdapter viewAdapter;
     private Activity activity;
 
-    public TasksHandler(DataControllable dataControllable, Activity activity, int secondsToWait) {
-        super(dataControllable);
+    public TasksHandler(DataControl dataControl, Activity activity, int secondsToWait) {
+        super(dataControl);
         this.activity = activity;
         viewAdapter = new ViewAdapter(activity, R.id.tasks);
         ((ListView) activity.findViewById(R.id.tasks)).setAdapter(viewAdapter);

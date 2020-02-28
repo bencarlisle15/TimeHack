@@ -2,11 +2,15 @@ package com.bencarlisle.timelibrary.main;
 
 import android.util.Log;
 
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 public class Helper {
 
@@ -32,7 +36,7 @@ public class Helper {
         return (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DATE);
     }
 
-    public static void writeLongToBytes(byte[] message, long value, int size, int pos) {
+    static void writeLongToBytes(byte[] message, long value, int size, int pos) {
         //todo negatives
         for (int i = size - 1; i >= 0; i--) {
             message[pos + i] = (byte) (value % 256);
@@ -40,24 +44,24 @@ public class Helper {
         }
     }
 
-    public static void writeStringToBytes(byte[] message, String str, int pos) {
+    static void writeStringToBytes(byte[] message, String str, int pos) {
         for (int i = 0; i < str.length(); i++) {
             message[pos++] = (byte) str.charAt(i);
         }
     }
 
-    public static void writeFloatToBytes(byte[] message, float value, int pos) {
+    static void writeFloatToBytes(byte[] message, float value, int pos) {
         byte[] floatArray = ByteBuffer.allocate(4).putFloat(value).array();
         writeBytesToBytes(message, floatArray, pos);
     }
 
-    public static void writeBytesToBytes(byte[] message, byte[] original, int pos) {
+    static void writeBytesToBytes(byte[] message, byte[] original, int pos) {
         for (byte b : original) {
             message[pos++] = b;
         }
     }
 
-    public static long readLongFromBytes(byte[] message, int size, int pos) {
+    static long readLongFromBytes(byte[] message, int size, int pos) {
         long val = 0;
         for (int i = pos; i < pos + size; i++) {
             val = 256 * val + ((message[i] + 256) % 256);
@@ -66,7 +70,7 @@ public class Helper {
 
     }
 
-    public static String readStringFromBytes(byte[] message, int endPos, int pos) {
+    static String readStringFromBytes(byte[] message, int endPos, int pos) {
         //todo wrong
         StringBuilder str = new StringBuilder();
         for (int i = pos; i < endPos; i++) {
@@ -75,7 +79,7 @@ public class Helper {
         return str.toString();
     }
 
-    public static float readFloatFromBytes(byte[] message, int pos) {
+    static float readFloatFromBytes(byte[] message, int pos) {
         byte[] floatArray = Arrays.copyOfRange(message, pos, pos + 4);
         return ByteBuffer.wrap(floatArray).getFloat();
     }
@@ -135,5 +139,77 @@ public class Helper {
     static long millisUntil(Calendar time) {
         Log.e("DIFFERENCE IS", time.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + " millis");
         return time.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+    }
+
+    public static byte[] serializeEvent(Event event) {
+        int size = getSize(event);
+        byte[] eventMessage = new byte[size];
+        int taskId = Integer.parseInt(event.getDescription());
+        Helper.writeLongToBytes(eventMessage, taskId, 4, 0);
+        Helper.writeLongToBytes(eventMessage, event.getStart().getDateTime().getValue(), 8, 4);
+        Helper.writeLongToBytes(eventMessage, event.getEnd().getDateTime().getValue(), 8, 12);
+        Helper.writeStringToBytes(eventMessage, event.getSummary(), 20);
+        return eventMessage;
+    }
+
+    public static Event readEvent(byte[] message) {
+        int taskId = (int) Helper.readLongFromBytes(message, 4, 0);
+        long startTime = Helper.readLongFromBytes(message, 8, 4);
+        long endTime = Helper.readLongFromBytes(message, 8, 12);
+        String summary = Helper.readStringFromBytes(message, message.length, 20);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startTime);
+        Calendar start = calendar;
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(endTime);
+        Calendar end = calendar;
+        return getEvent(start, end, summary, taskId);
+    }
+
+    static int getSize(Event event) {
+        return 20 + event.getSummary().length();
+    }
+
+    public static boolean isTask(Event event) {
+        return !event.getDescription().equals("-1");
+    }
+
+    public static Event getEvent(EventDateTime startTime, EventDateTime endTime, String summary, int taskId) {
+        Event event= new Event().setSummary(summary);
+        event.setStart(startTime);
+        event.setEnd(endTime);
+        event.setDescription(String.valueOf(taskId));
+        return event;
+    }
+
+    public static Event getEvent(Calendar startTime, Calendar endTime, String description, int taskId) {
+        return getEvent(getDateTime(startTime), getDateTime(endTime), description, taskId);
+    }
+
+    public static Calendar getCalendar(EventDateTime eventDateTime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(eventDateTime.getDateTime().getValue());
+        return calendar;
+    }
+
+
+    public static EventDateTime getDateTime(Calendar calendar) {
+        Calendar currentDate = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
+        calendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR));
+        Date date = calendar.getTime();
+        DateTime dateTime = new DateTime(date);
+        return new EventDateTime().setDateTime(dateTime).setTimeZone("America/New_York");
+    }
+
+    public static EventDateTime initEventDateTime(long time) {
+        DateTime dateTime = new DateTime(time);
+        return new EventDateTime().setDateTime(dateTime).setTimeZone("America/New_York");
+    }
+
+    public static Calendar initCalendar(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        return calendar;
     }
 }

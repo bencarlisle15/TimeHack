@@ -2,6 +2,8 @@ package com.bencarlisle.timelibrary.main;
 
 import android.util.Log;
 
+import com.google.api.services.calendar.model.Event;
+
 import java.time.YearMonth;
 import java.util.Calendar;
 import java.util.Objects;
@@ -30,7 +32,7 @@ class Parser {
         if (startTime == null || endTime == null) {
             return null;
         }
-        return new Event(startTime, endTime, description, -1);
+        return Helper.getEvent(startTime, endTime, description, -1);
     }
 
     public static Task parseTaskResult(String str) {
@@ -122,7 +124,8 @@ class Parser {
         if (startTime == null || endTime == null || days == null) {
             return null;
         }
-        Event event = new Event(startTime, endTime, description, -1);
+        Event event = Helper.getEvent(startTime, endTime, description, -1);
+        Log.e("EVENT", event.toString());
         return new Returnable(days, event);
     }
 

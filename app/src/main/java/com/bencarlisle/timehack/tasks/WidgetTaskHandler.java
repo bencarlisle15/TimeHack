@@ -10,7 +10,6 @@ import com.bencarlisle.timehack.R;
 import com.bencarlisle.timehack.main.DataControl;
 import com.bencarlisle.timelibrary.main.Helper;
 import com.bencarlisle.timelibrary.main.Task;
-import com.bencarlisle.timelibrary.tasks.TasksModel;
 
 class WidgetTaskHandler extends TasksModel {
     private AppWidgetManager appWidgetManager;

@@ -4,17 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
-import com.bencarlisle.timehack.events.EventsActivity;
 import com.bencarlisle.timehack.returnables.ReturnablesActivity;
 import com.bencarlisle.timehack.tasks.TasksActivity;
 
 public abstract class GeneralActivity extends Activity {
-
-    public void dayCalendar(View view) {
-        if (!(this instanceof EventsActivity)) {
-            startActivity(new Intent(this, EventsActivity.class));
-        }
-    }
 
     public void returnables(View view) {
         if (!(this instanceof ReturnablesActivity)) {

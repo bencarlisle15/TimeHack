@@ -3,6 +3,8 @@ package com.bencarlisle.timelibrary.main;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.api.services.calendar.model.Event;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -43,7 +45,7 @@ public class Returnable implements Serializable {
         }
         this.days = days;
         byte[] eventArray = Arrays.copyOf(message, 11);
-        this.event = new Event(eventArray, needsId);
+        this.event = Helper.readEvent(eventArray);
     }
 
     public static void setReturnableId(int returnableId) {
@@ -120,13 +122,13 @@ public class Returnable implements Serializable {
         byte[] message = new byte[getSize()];
         Helper.writeLongToBytes(message, id, 4, 0);
         Helper.writeStringToBytes(message, getBitfield(), 4);
-        byte[] eventArray = event.serialize();
+        byte[] eventArray = Helper.serializeEvent(event);
         Helper.writeBytesToBytes(message, eventArray, 11);
         return message;
     }
 
     @Override
     public int getSize() {
-        return 11 + event.getSize();
+        return 11 + Helper.getSize(event);
     }
 }
