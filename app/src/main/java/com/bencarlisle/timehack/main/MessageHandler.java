@@ -58,6 +58,10 @@ public class MessageHandler extends WearableListenerService {
                 byte[] task = dataMap.getByteArray("data");
                 dataControl.addTask(new Task(task, true));
                 break;
+            case "removeEvent":
+                byte[] deletedEvent = dataMap.getByteArray("data");
+                dataControl.removeEvent(Helper.readEvent(deletedEvent));
+                break;
             default:
                 Log.e("App", "Command: '" + data + "' not found");
                 break;

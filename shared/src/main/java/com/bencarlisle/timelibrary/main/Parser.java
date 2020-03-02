@@ -18,10 +18,18 @@ class Parser {
             return null;
         }
         int startHour = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
-        int startMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
+        String startMinuteString = matcher.group(4);
+        int startMinute = 0;
+        if (startMinuteString != null && startMinuteString.length() > 0) {
+            startMinute = Integer.parseInt(startMinuteString);
+        }
         String startAm = matcher.group(5);
         int endHour = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
-        int endMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(8)));
+        String endMinuteString = matcher.group(8);
+        int endMinute = 0;
+        if (endMinuteString != null && endMinuteString.length() > 0) {
+            endMinute = Integer.parseInt(endMinuteString);
+        }
         String endAm = matcher.group(9);
         String description = matcher.group(10);
 
@@ -36,7 +44,7 @@ class Parser {
     }
 
     public static Task parseTaskResult(String str) {
-        Matcher matcher = Pattern.compile("^add (.+) (due|to|do) ([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] with (\\d{1,2}) hours and priority (\\d)$").matcher(str);
+        Matcher matcher = Pattern.compile("^[a|A]dd (.+) (due|to|do) ([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] with (\\d{1,2}) hours and priority (\\d)\\.?$").matcher(str);
         if (!matcher.find()) {
             return null;
         }
@@ -103,16 +111,24 @@ class Parser {
     }
 
     public static Returnable parseReturnableResult(String result) {
-        Matcher matcher = Pattern.compile("^([a-zA-Z ]+) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) to (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
+        Matcher matcher = Pattern.compile("^([a-zA-Z ]+) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) [t|T]o (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
         }
         String daysString = matcher.group(1);
         int startHour = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
-        int startMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(4)));
+        String startMinuteString = matcher.group(4);
+        int startMinute = 0;
+        if (startMinuteString != null && startMinuteString.length() > 0) {
+            startMinute = Integer.parseInt(startMinuteString);
+        }
         String startAm = matcher.group(5);
         int endHour = Integer.parseInt(Objects.requireNonNull(matcher.group(6)));
-        int endMinute = Integer.parseInt(Objects.requireNonNull(matcher.group(8)));
+        String endMinuteString = matcher.group(8);
+        int endMinute = 0;
+        if (endMinuteString != null && endMinuteString.length() > 0) {
+            endMinute = Integer.parseInt(endMinuteString);
+        }
         String endAm = matcher.group(9);
         String description = matcher.group(10);
 
@@ -125,7 +141,6 @@ class Parser {
             return null;
         }
         Event event = Helper.getEvent(startTime, endTime, description, -1);
-        Log.e("EVENT", event.toString());
         return new Returnable(days, event);
     }
 

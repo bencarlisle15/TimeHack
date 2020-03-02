@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="type_prompt">Create a New Element</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="description">Description</string>
+    <string name="s">S</string>
+    <string name="m">M</string>
+    <string name="t">T</string>
+    <string name="w">W</string>
+    <string name="th">Th</string>
+    <string name="f">F</string>
+    <string name="sa">Sa</string>
+    <string name="hours_required">Hours Required</string>
+    <string name="priority">Priority</string>
+    <string name="submit">Submit</string>
+    <string name="due_date">Due Date</string>
+
+    <string-array name="types">
+        <item>Choose a Type:</item>
+        <item>Event</item>
+        <item>Returnable</item>
+        <item>Task</item>
+    </string-array>
+</resources>

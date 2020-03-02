@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.bencarlisle.timehack">
 
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
@@ -33,14 +32,25 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/bencarlisle" />
             </intent-filter>
         </service>
+
+        <activity android:name=".main.WearVoiceRecognitionActivity" />
         <activity
-            android:name=".main.WearVoiceRecognitionActivity">
+            android:name=".events.EventsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            tools:node="replace">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="com.bencarlisle.timehack"/>
+            </intent-filter>
+        </activity>
     </application>
-
 </manifest>

@@ -32,7 +32,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/tasks_widget_info" />
         </receiver>
-        <activity android:name=".main.AuthenticateActivity" />
+
         <service
             android:name=".tasks.TasksViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
@@ -73,9 +73,7 @@
         <activity android:name=".tasks.TasksActivity" />
         <activity
             android:name=".main.AppVoiceRecognitionActivity" />
-
-
-
+        <activity android:name=".main.AuthenticateActivity" />
         <activity
             android:name="net.openid.appauth.RedirectUriReceiverActivity"
             tools:node="replace">

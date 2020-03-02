@@ -12,24 +12,31 @@ import com.bencarlisle.timelibrary.main.Returnable;
 import com.bencarlisle.timelibrary.main.Task;
 import com.google.api.services.calendar.model.Event;
 
+import net.openid.appauth.AuthState;
+
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class DataControl extends SQLiteOpenHelper implements DataControllable {
+
     private SQLiteDatabase db;
+    private Context context;
 
     public DataControl(Context context) {
         super(context, "Calendar.db", null, 1);
+        this.context = context;
         db = this.getWritableDatabase();
 //        onUpgrade(db, 0,0);
         setIds();
     }
 
-    void setToken(String token) {
-        if (getToken() == null) {
-            db.execSQL("INSERT INTO Token VALUES ('" + token + "');");
+    public void setAuthState(String authState) {
+        if (getAuthState() == null) {
+            db.execSQL("INSERT INTO AuthState VALUES ('" + authState + "');");
         } else {
-            db.execSQL("UPDATE Token SET token=" + token + ";");
+            db.execSQL("UPDATE AuthState SET authState='" + authState + "';");
         }
     }
 
@@ -66,7 +73,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Token (token VARCHAR(256) UNIQUE PRIMARY KEY NOT NULL)");
+        db.execSQL("CREATE TABLE AuthState (authState VARCHAR(256) UNIQUE PRIMARY KEY NOT NULL)");
         db.execSQL("CREATE TABLE Returnables (id INTEGER UNIQUE PRIMARY KEY NOT NULL, days TEXT NOT NULL, description TEXT NOT NULL, startTime BIGINTEGER NOT NULL, endTime BIGINTEGER NOT NULL, taskId INTEGER NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Tasks (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, dueDate BIGINTEGER NOT NULL, priority INTEGER, hoursRequired FLOAT, hoursCompleted FLOAT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Organized (lastDay INTEGER NOT NULL)");
@@ -89,13 +96,11 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
     public void addEvent(Event event) {
         //sql injection is trivial
         Log.e("DATA EVENT", "Adding event " + event);
-        CalendarControl.addEvent(event, getToken());
+        CalendarControl.addEvent(event, context, getAuthState());
     }
 
     public void addReturnable(Returnable returnable) {
         Log.e("DATA RETURNABLE", "ADDING returnable" + returnable);
-        Log.e("Ret", returnable.getEvent() + ":");
-        Log.e("end", returnable.getEvent().getStart().toString() + ":");
         db.execSQL(getSQL("addReturnable", returnable));
     }
 
@@ -109,14 +114,23 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         onUpgrade(db, 0,0);
     }
 
-    String getToken() {
-        Cursor cursor = db.rawQuery("SELECT token FROM Token;", null);
-        String token = null;
+    AuthState getAuthState() {
+        Cursor cursor = db.rawQuery("SELECT authState FROM AuthState;", null);
+        AuthState authState = null;
         if (cursor.moveToFirst()) {
-            token = cursor.getString(cursor.getColumnIndex("token"));
+            String authStateString = cursor.getString(cursor.getColumnIndex("authState"));
+            try {
+                authState = AuthState.jsonDeserialize(authStateString);
+            } catch (JSONException ignored) {
+
+            }
         }
         cursor.close();
-        return token;
+        return authState;
+    }
+
+    public void removeEvent(Event event) {
+        CalendarControl.removeEvent(event, context, getAuthState());
     }
 
     public void removeReturnable(int id) {
@@ -129,7 +143,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Token;");
+        db.execSQL("DROP TABLE IF EXISTS AuthState;");
         db.execSQL("DROP TABLE IF EXISTS Returnables;");
         db.execSQL("DROP TABLE IF EXISTS Tasks;");
         db.execSQL("DROP TABLE IF EXISTS Organized;");
@@ -157,7 +171,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
     }
 
     ArrayList<Event> getTaskEvents() {
-        return CalendarControl.getTaskEvents(getToken());
+        return CalendarControl.getTaskEvents(getAuthState());
     }
 
     void addTaskHours(int taskId, float hoursCompleted) {

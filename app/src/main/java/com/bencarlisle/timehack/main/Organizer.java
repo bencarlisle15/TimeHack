@@ -15,6 +15,10 @@ import com.bencarlisle.timelibrary.main.Task;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
+import net.openid.appauth.AuthState;
+import net.openid.appauth.AuthorizationService;
+import net.openid.appauth.TokenRequest;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -94,8 +98,23 @@ public class Organizer extends JobService {
     }
 
     private void runTaskAdder(Context context) {
-        Log.e("Organizer", "Running task adder");
         DataControl dataControl = new DataControl(context);
+        AuthState authState = dataControl.getAuthState();
+        if (authState.getNeedsTokenRefresh()) {
+            TokenRequest request = authState.createTokenRefreshRequest();
+            AuthorizationService authorizationService = new AuthorizationService(context);
+            authorizationService.performTokenRequest(request, (response, error) -> {
+                authorizationService.dispose();
+                authState.update(response, error);
+                runTaskAdderWithTokens(dataControl, context);
+            });
+        } else {
+            runTaskAdderWithTokens(dataControl, context);
+        }
+    }
+
+    private void runTaskAdderWithTokens(DataControl dataControl, Context context) {
+        Log.e("Organizer", "Running task adder");
         for (Event event: dataControl.getTaskEvents()) {
             dataControl.addTaskHours(Integer.parseInt(event.getDescription()), getHoursBetween(event.getStart(), event.getEnd()));
         }

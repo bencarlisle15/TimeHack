@@ -44,7 +44,7 @@ public class Returnable implements Serializable {
             days[i] = (bitfield.charAt(i) == '1');
         }
         this.days = days;
-        byte[] eventArray = Arrays.copyOf(message, 11);
+        byte[] eventArray = Arrays.copyOfRange(message, 11, message.length);
         this.event = Helper.readEvent(eventArray);
     }
 

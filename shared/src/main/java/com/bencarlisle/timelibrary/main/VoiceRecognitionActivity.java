@@ -57,7 +57,7 @@ public abstract class VoiceRecognitionActivity extends Activity {
                     break;
                 }
             }
-            Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+            Helper.makeToast(this, status);
             sendRecognizeIntent();
         } else {
             Log.e("FINISHED", "no speech");

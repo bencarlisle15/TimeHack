@@ -1,6 +1,10 @@
 package com.bencarlisle.timelibrary.main;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
@@ -33,7 +37,7 @@ public class Helper {
     }
 
     public static String convertDateToString(Calendar calendar) {
-        return (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DATE);
+        return (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DATE) +"/" + calendar.get(Calendar.YEAR);
     }
 
     static void writeLongToBytes(byte[] message, long value, int size, int pos) {
@@ -127,6 +131,12 @@ public class Helper {
         Log.e("ARRAY", str.toString());
     }
 
+    public static void makeToast(final Context context, String str) {
+        Log.e("Toast", str);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> Toast.makeText(context, str, Toast.LENGTH_SHORT).show());
+    }
+
     private static byte[] serializeWithLength(Serializable serializable) {
         int size = serializable.getSize();
         byte[] message = new byte[size + 4];
@@ -211,5 +221,11 @@ public class Helper {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
         return calendar;
+    }
+
+    public static boolean isEqualDates(EventDateTime dateTime1, EventDateTime dateTime2) {
+        long time1 = dateTime1.getDate().getValue();
+        long time2 = dateTime2.getDate().getValue();
+        return time1 == time2;
     }
 }
