@@ -6,14 +6,13 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.api.services.calendar.model.Event;
 
 import java.util.ArrayList;
 
 public abstract class VoiceRecognitionActivity extends Activity {
-    protected int SPEECH_REQUEST_CODE = 1;
+    private int SPEECH_REQUEST_CODE = 1;
 
     protected abstract DataControllable getDataControllable();
 
@@ -43,7 +42,7 @@ public abstract class VoiceRecognitionActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    protected void analyzeText(Intent data) {
+    private void analyzeText(Intent data) {
         Looper.prepare();
         ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
         if (results != null && results.size() > 0) {
@@ -81,6 +80,11 @@ public abstract class VoiceRecognitionActivity extends Activity {
         if (task != null) {
             dataControllable.addTask(task);
             return "Successfully added task";
+        }
+        Event future = Parser.parseFutureResult(result);
+        if (future != null) {
+            dataControllable.addFuture(future);
+            return "Successfully added future";
         }
         return null;
     }

@@ -109,6 +109,20 @@ class CalendarControl {
         return events;
     }
 
+    static ArrayList<Event> getEvents(AuthState authState) {
+        ArrayList<Event> allEvents = getEvents(authState.getAccessToken(), true);
+        if (allEvents == null) {
+            return null;
+        }
+        ArrayList<Event> events = new ArrayList<>();
+        for (Event event: allEvents) {
+            if (Helper.isTask(event)) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
     private static ArrayList<Event> getEvents(String accessToken, boolean isToday) {
         Calendar calendar = getCalendar(accessToken);
         if (calendar == null) {

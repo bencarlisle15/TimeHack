@@ -32,7 +32,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         setIds();
     }
 
-    public void setAuthState(String authState) {
+    void setAuthState(String authState) {
         if (getAuthState() == null) {
             db.execSQL("INSERT INTO AuthState VALUES ('" + authState + "');");
         } else {
@@ -80,18 +80,17 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         db.execSQL("INSERT INTO Organized (lastDay) VALUES (-1)");
     }
 
-    int getNextReturnableId() {
+    private int getNextReturnableId() {
         //sql injection is trivial
         Cursor cursor = db.rawQuery(getSQL("getNextReturnableId", null), null);
         return getNextId(cursor);
     }
 
-    int getNextTaskId() {
+    private int getNextTaskId() {
         //sql injection is trivial
         Cursor cursor = db.rawQuery(getSQL("getNextTaskId", null), null);
         return getNextId(cursor);
     }
-
 
     public void addEvent(Event event) {
         //sql injection is trivial
@@ -108,6 +107,13 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         //sql injection is trivial
         Log.e("DATA TASK", "ADDING TASK " + task);
         db.execSQL(getSQL("addTask", task));
+    }
+
+    public void addFuture(Event event) {
+        //sql injection is trivial
+        Log.e("DATA TASK", "ADDING FUTURE " + event);
+        //same as adding event
+        CalendarControl.addEvent(event, context, getAuthState());
     }
 
     void reboot() {
@@ -170,6 +176,11 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         return returnables;
     }
 
+
+    ArrayList<Event> getFuturesOnDay() {
+        return CalendarControl.getEvents(getAuthState());
+    }
+
     ArrayList<Event> getTaskEvents() {
         return CalendarControl.getTaskEvents(getAuthState());
     }
@@ -181,23 +192,6 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
     void cleanTasks() {
         db.execSQL("DELETE FROM Tasks where hoursCompleted >= hoursRequired");
     }
-
-//    private static ArrayList<Event> getEvents(Cursor cursor) {
-//        ArrayList<Event> events = new ArrayList<>();
-//        if (cursor.moveToFirst()) {
-//            while (!cursor.isAfterLast()) {
-//                int id = cursor.getInt(cursor.getColumnIndex("id"));
-//                String description = cursor.getString(cursor.getColumnIndex("description"));
-//                long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
-//                long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
-//                int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
-//                events.add(new Event(id, description, startTime, endTime, taskId));
-//                cursor.moveToNext();
-//            }
-//        }
-//        cursor.close();
-//        return events;
-//    }
 
     private static ArrayList<Returnable> getReturnables(Cursor cursor) {
         ArrayList<Returnable> returnables = new ArrayList<>();

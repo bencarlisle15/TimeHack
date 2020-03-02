@@ -7,8 +7,5 @@ public interface DataControllable {
     void addEvent(Event event);
     void addReturnable(Returnable returnable);
     void addTask(Task task);
-
-    void setAuthState(String jsonSerializeString);
-
-    void close();
+    void addFuture(Event event);
 }

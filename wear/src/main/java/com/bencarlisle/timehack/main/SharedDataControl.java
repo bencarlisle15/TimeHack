@@ -5,12 +5,9 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.CalendarContract;
 import android.support.wearable.provider.WearableCalendarContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bencarlisle.timelibrary.main.DataControllable;
 import com.bencarlisle.timelibrary.main.Helper;
@@ -20,10 +17,6 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.api.services.calendar.model.Event;
-
-import net.openid.appauth.AuthState;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,25 +46,10 @@ public class SharedDataControl implements DataControllable {
         sendAngIgnore("addTask", task.serialize());
     }
 
-    @Override
-    public void setAuthState(String authState) {
-        context.getSharedPreferences("APP_AUTH", Context.MODE_PRIVATE).edit().putString("APP_AUTH", authState).apply();
-    }
-
-    public AuthState getAuthState() {
-        String jsonString = context.getSharedPreferences("APP_AUTH", Context.MODE_PRIVATE).getString("APP_AUTH", null);
-        if (jsonString != null) {
-            try {
-                return AuthState.jsonDeserialize(jsonString);
-            } catch (JSONException e) {
-                return null;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void close() {
+    public void addFuture(Event future) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(future.getStart().getDateTime().getValue());
+        sendAngIgnore("addFuture", Helper.serializeEvent(future));
     }
 
     private int sendByteMessage(String message, byte[] data) {

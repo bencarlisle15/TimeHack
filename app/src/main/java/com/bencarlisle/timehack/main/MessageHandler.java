@@ -45,6 +45,11 @@ public class MessageHandler extends WearableListenerService {
         String data = new String(dataMap.getByteArray("message"));
         DataControl dataControl = new DataControl(this);
         switch (data) {
+            case "addFuture":
+                byte[] future = dataMap.getByteArray("data");
+                Helper.printArray(data.getBytes());
+                dataControl.addEvent(Helper.readFuture(future));
+                break;
             case "addEvent":
                 byte[] event = dataMap.getByteArray("data");
                 Helper.printArray(data.getBytes());

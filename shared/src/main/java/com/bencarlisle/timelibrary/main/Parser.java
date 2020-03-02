@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 class Parser {
 
-    public static Event parseEventResult(String result) {
+    static Event parseEventResult(String result) {
         Matcher matcher = Pattern.compile("^([fF]rom )?(\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) [tT]o (\\d{1,2})(:(\\d\\d))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
@@ -43,7 +43,7 @@ class Parser {
         return Helper.getEvent(startTime, endTime, description, -1);
     }
 
-    public static Task parseTaskResult(String str) {
+    static Task parseTaskResult(String str) {
         Matcher matcher = Pattern.compile("^[a|A]dd (.+) (due|to|do) ([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] with (\\d{1,2}) hours and priority (\\d)\\.?$").matcher(str);
         if (!matcher.find()) {
             return null;
@@ -110,7 +110,7 @@ class Parser {
         return calendar;
     }
 
-    public static Returnable parseReturnableResult(String result) {
+    static Returnable parseReturnableResult(String result) {
         Matcher matcher = Pattern.compile("^([a-zA-Z ]+) from (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) [t|T]o (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
         if (!matcher.find()) {
             return null;
@@ -173,6 +173,45 @@ class Parser {
             days[index] = true;
         }
         return days;
+    }
+
+    static Event parseFutureResult(String result) {
+        Matcher matcher = Pattern.compile("^([A-Z][a-z]*) (\\d{1,2})[a-z][a-z] from (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) [t|T]o (\\d{1,2})(:(\\d{1,2}))? (AM|PM|a m|p m|a\\.m\\.|p\\.m\\.) (.+)$").matcher(result);
+        if (!matcher.find()) {
+            return null;
+        }
+        int month = getMonth(Objects.requireNonNull(matcher.group(1)));
+        int day = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
+
+        int startHour = Integer.parseInt(Objects.requireNonNull(matcher.group(3)));
+        String startMinuteString = matcher.group(5);
+        int startMinute = 0;
+        if (startMinuteString != null && startMinuteString.length() > 0) {
+            startMinute = Integer.parseInt(startMinuteString);
+        }
+        String startAm = matcher.group(6);
+        int endHour = Integer.parseInt(Objects.requireNonNull(matcher.group(7)));
+        String endMinuteString = matcher.group(9);
+        int endMinute = 0;
+        if (endMinuteString != null && endMinuteString.length() > 0) {
+            endMinute = Integer.parseInt(endMinuteString);
+        }
+        String endAm = matcher.group(10);
+        String description = matcher.group(11);
+
+        description = Objects.requireNonNull(description).substring(0, 1).toUpperCase() + description.substring(1);
+
+        Calendar date = getDate(month, day);
+        Calendar startTime = getTime(startHour, startMinute, startAm);
+        Calendar endTime = getTime(endHour, endMinute, endAm);
+        if (startTime == null || endTime == null || date == null) {
+            return null;
+        }
+        startTime.set(Calendar.DAY_OF_YEAR, date.get(Calendar.DAY_OF_YEAR));
+        startTime.set(Calendar.YEAR, date.get(Calendar.YEAR));
+        endTime.set(Calendar.DAY_OF_YEAR, date.get(Calendar.DAY_OF_YEAR));
+        endTime.set(Calendar.YEAR, date.get(Calendar.YEAR));
+        return Helper.getFuture(startTime, endTime, description, -1);
     }
 
     private static Calendar getTime(int hour, int minute, String am) {

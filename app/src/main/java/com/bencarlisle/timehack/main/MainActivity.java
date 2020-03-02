@@ -2,6 +2,7 @@ package com.bencarlisle.timehack.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -92,6 +93,14 @@ public class MainActivity extends GeneralActivity {
 					taskExtras.setVisibility(View.VISIBLE);
 					submit.setVisibility(View.VISIBLE);
 					break;
+				case 4:
+					times.setVisibility(View.VISIBLE);
+					description.setVisibility(View.VISIBLE);
+					days.setVisibility(View.GONE);
+					dueDate.setVisibility(View.VISIBLE);
+					taskExtras.setVisibility(View.GONE);
+					submit.setVisibility(View.VISIBLE);
+					break;
 				default:
 					times.setVisibility(View.GONE);
 					description.setVisibility(View.GONE);
@@ -128,11 +137,28 @@ public class MainActivity extends GeneralActivity {
 			case 3:
 				createTask(description, dueDate, hoursRequired, priority);
 				break;
+			case 4:
+				createFuture(startTime, endTime, description, dueDate);
 			default:
 				Helper.makeToast(this, "An error occurred");
 		}
-		setViewsFor(0);
-}
+	}
+
+	private void createFuture(EditText startTime, EditText endTime, EditText description, EditText dueDate) {
+		Calendar[] timesArray = getTimesArray(startTime, endTime);
+		Calendar dueDateDate = getDueDate(dueDate);
+		timesArray[0].set(Calendar.DAY_OF_YEAR, dueDateDate.get(Calendar.DAY_OF_YEAR));
+		timesArray[0].set(Calendar.YEAR, dueDateDate.get(Calendar.YEAR));
+		timesArray[1].set(Calendar.DAY_OF_YEAR, dueDateDate.get(Calendar.DAY_OF_YEAR));
+		timesArray[1].set(Calendar.YEAR, dueDateDate.get(Calendar.YEAR));
+		Log.e("START", Helper.convertDateToString(dueDateDate) + " " + Helper.convertDateToString(timesArray[0]) + " " + Helper.convertDateToString(timesArray[1]));
+		String descriptionText = description.getText().toString();
+		Event future = Helper.getFuture(timesArray[0], timesArray[1], descriptionText, -1);
+		DataControl dataControl = new DataControl(this);
+		dataControl.addFuture(future);
+		dataControl.close();
+		Helper.makeToast(this, "Successfully created future");
+	}
 
 	private void createEvent(EditText startTime, EditText endTime, EditText description) {
 		Calendar[] timesArray = getTimesArray(startTime, endTime);
@@ -182,7 +208,7 @@ public class MainActivity extends GeneralActivity {
 		Matcher matcher = pattern.matcher(timeText);
 		Calendar calendar = Calendar.getInstance();
 
-		if(matcher.find() && matcher.groupCount() == 4) {
+		if(matcher.find() && matcher.groupCount() == 3) {
 			int hour = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
 			int minute = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
 			int amOrPm = Objects.equals(matcher.group(3), "A") ? Calendar.AM : Calendar.PM;
@@ -209,10 +235,11 @@ public class MainActivity extends GeneralActivity {
 		Matcher matcher = pattern.matcher(dueDateText);
 		Calendar calendar = Calendar.getInstance();
 
-		if(matcher.find() && matcher.groupCount() == 4) {
-			int month = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
+		if(matcher.find() && matcher.groupCount() == 3) {
+			int month = Integer.parseInt(Objects.requireNonNull(matcher.group(1))) - 1;
 			int day = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
-			int year = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
+			int year = Integer.parseInt(Objects.requireNonNull(matcher.group(3)));
+			Log.e("dasd", month + " " + day + " " + year);
 			calendar.set(Calendar.MONTH, month);
 			calendar.set(Calendar.DAY_OF_MONTH, day);
 			calendar.set(Calendar.YEAR, year);

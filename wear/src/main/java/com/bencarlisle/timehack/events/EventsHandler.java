@@ -16,10 +16,6 @@ import com.bencarlisle.timelibrary.main.Merger;
 import com.bencarlisle.timelibrary.main.Pollable;
 import com.google.api.services.calendar.model.Event;
 
-import net.openid.appauth.AuthState;
-import net.openid.appauth.AuthorizationService;
-import net.openid.appauth.TokenRequest;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -40,33 +36,17 @@ class EventsHandler implements Pollable {
 //        createTempEvent();
     }
 
-    public void startPolling() {
+    void startPolling() {
         merger = new Merger(this, 60);
         merger.start();
     }
 
-    public void stopPolling() {
+    void stopPolling() {
         merger.interrupt();
         merger = null;
     }
 
     public void poll() {
-        SharedDataControl dataControl = new SharedDataControl(activity);
-        AuthState authState = dataControl.getAuthState();
-        if (authState.getNeedsTokenRefresh()) {
-            TokenRequest request = authState.createTokenRefreshRequest();
-            AuthorizationService authorizationService = new AuthorizationService(activity);
-            authorizationService.performTokenRequest(request, (response, error) -> {
-                authorizationService.dispose();
-                authState.update(response, error);
-                new Thread(this::pollWithTokens).start();
-            });
-        } else {
-            new Thread(this::pollWithTokens).start();
-        }
-    }
-
-    private synchronized void pollWithTokens() {
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
             if (newEvents == null) {

@@ -1,12 +1,10 @@
 package com.bencarlisle.timehack.main;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
 
 import com.bencarlisle.timelibrary.main.Helper;
 

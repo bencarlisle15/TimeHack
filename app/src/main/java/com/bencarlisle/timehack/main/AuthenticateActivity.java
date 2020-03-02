@@ -1,14 +1,11 @@
 package com.bencarlisle.timehack.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.bencarlisle.timelibrary.main.DataControllable;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationException;

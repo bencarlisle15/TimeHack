@@ -129,6 +129,12 @@ public class Organizer extends JobService {
             events.add(returnable.getEvent());
         }
 
+        ArrayList<Event> futures = dataControl.getFuturesOnDay();
+        for (Event future: futures) {
+            dataControl.addEvent(future);
+            events.add(future);
+        }
+
         TreeSet<Task> tasks = new TreeSet<>(dataControl.getTasks());
 
         Calendar start = Calendar.getInstance();

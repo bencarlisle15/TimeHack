@@ -38,15 +38,6 @@ class WidgetTaskHandler extends TasksModel {
         updateWidget();
     }
 
-    public void clearViews() {
-        synchronized (tasks) {
-            for (int i = 0; i < tasks.size(); i++) {
-                TasksRemoteViewsFactory.removeView(tasks.get(i).getId());
-            }
-        }
-        updateWidget();
-    }
-
     public void addTaskView(Task task) {
         RemoteViews newTask = new RemoteViews(context.getPackageName(), R.layout.task);
         newTask.setTextViewText(R.id.description, task.getDescription());

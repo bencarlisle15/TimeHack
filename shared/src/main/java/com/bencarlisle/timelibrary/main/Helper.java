@@ -176,6 +176,20 @@ public class Helper {
         return getEvent(start, end, summary, taskId);
     }
 
+    public static Event readFuture(byte[] message) {
+        int taskId = (int) Helper.readLongFromBytes(message, 4, 0);
+        long startTime = Helper.readLongFromBytes(message, 8, 4);
+        long endTime = Helper.readLongFromBytes(message, 8, 12);
+        String summary = Helper.readStringFromBytes(message, message.length, 20);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startTime);
+        Calendar start = calendar;
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(endTime);
+        Calendar end = calendar;
+        return getFuture(start, end, summary, taskId);
+    }
+
     static int getSize(Event event) {
         return 20 + event.getSummary().length();
     }
@@ -184,7 +198,7 @@ public class Helper {
         return !event.getDescription().equals("-1");
     }
 
-    public static Event getEvent(EventDateTime startTime, EventDateTime endTime, String summary, int taskId) {
+    private static Event getEvent(EventDateTime startTime, EventDateTime endTime, String summary, int taskId) {
         Event event= new Event().setSummary(summary);
         event.setStart(startTime);
         event.setEnd(endTime);
@@ -203,7 +217,7 @@ public class Helper {
     }
 
 
-    public static EventDateTime getDateTime(Calendar calendar) {
+    private static EventDateTime getDateTime(Calendar calendar) {
         Calendar currentDate = Calendar.getInstance();
         calendar.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
         calendar.set(Calendar.DAY_OF_YEAR, currentDate.get(Calendar.DAY_OF_YEAR));
@@ -212,8 +226,9 @@ public class Helper {
         return new EventDateTime().setDateTime(dateTime).setTimeZone("America/New_York");
     }
 
-    public static EventDateTime initEventDateTime(long time) {
-        DateTime dateTime = new DateTime(time);
+    private static EventDateTime getDateAndTime(Calendar calendar) {
+        Date date = calendar.getTime();
+        DateTime dateTime = new DateTime(date);
         return new EventDateTime().setDateTime(dateTime).setTimeZone("America/New_York");
     }
 
@@ -227,5 +242,9 @@ public class Helper {
         long time1 = dateTime1.getDate().getValue();
         long time2 = dateTime2.getDate().getValue();
         return time1 == time2;
+    }
+
+    public static Event getFuture(Calendar startTime, Calendar endTime, String description, int taskId) {
+        return getEvent(getDateAndTime(startTime), getDateAndTime(endTime), description, taskId);
     }
 }

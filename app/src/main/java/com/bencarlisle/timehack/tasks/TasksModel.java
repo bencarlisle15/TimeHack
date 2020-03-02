@@ -12,25 +12,19 @@ import java.util.Calendar;
 
 public abstract class TasksModel implements Pollable {
 
-    protected final ArrayList<Task> tasks = new ArrayList<>();
-    protected DataControl dataControl;
-    private Merger merger;
+    final ArrayList<Task> tasks = new ArrayList<>();
+    DataControl dataControl;
 
     protected abstract void addTaskView(Task task);
     protected abstract void deleteTask(int id);
 
-    protected TasksModel(DataControl dataControl) {
+    TasksModel(DataControl dataControl) {
         this.dataControl = dataControl;
     }
 
-    public void startPolling(int secondsToWait) {
-        merger = new Merger(this, secondsToWait);
+    void startPolling(int secondsToWait) {
+        Merger merger = new Merger(this, secondsToWait);
         merger.start();
-    }
-
-    public void stopPolling() {
-        merger.interrupt();
-        merger = null;
     }
 
     public void poll() {
