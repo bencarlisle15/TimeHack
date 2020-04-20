@@ -39,14 +39,14 @@ public abstract class TasksModel implements Pollable {
                     tasks.add(task);
                     addTaskView(task);
                 } else if (tasks.get(tasks.indexOf(task)).getHoursCompleted() != task.getHoursCompleted()) {
-                    deleteTask(task.getId());
+                    deleteTask(task.hashCode());
                     addTask(task);
                 }
             }
             for (int i = 0; i < tasks.size(); i++) {
                 if (!newTasks.contains(tasks.get(i))) {
-                    Log.e("REMOVING TASK ", String.valueOf(tasks.get(i).getId()));
-                    deleteTask(tasks.get(i).getId());
+                    Log.e("REMOVING TASK ", String.valueOf(tasks.get(i).hashCode()));
+                    deleteTask(tasks.get(i).hashCode());
                 }
             }
         }

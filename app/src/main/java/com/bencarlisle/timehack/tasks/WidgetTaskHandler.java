@@ -29,7 +29,7 @@ class WidgetTaskHandler extends TasksModel {
             dataControl.removeTask(id);
             TasksRemoteViewsFactory.removeView(id);
             for (int i = 0; i < tasks.size(); i++) {
-                if (tasks.get(i).getId() == id) {
+                if (tasks.get(i).hashCode() == id) {
                     tasks.remove(i);
                     break;
                 }
@@ -44,8 +44,8 @@ class WidgetTaskHandler extends TasksModel {
         newTask.setTextViewText(R.id.due_date, Helper.convertDateToString(task.getDueDate()));
         newTask.setTextViewText(R.id.hours_left, String.valueOf(task.getHoursLeft()));
         newTask.setTextViewText(R.id.task_priority, String.valueOf(task.getPriority()));
-        newTask.setOnClickPendingIntent(R.id.task, getPendingSelfIntent("deleteTask" + task.getId()));
-        TasksRemoteViewsFactory.addView(task.getId(), newTask);
+        newTask.setOnClickPendingIntent(R.id.task, getPendingSelfIntent("deleteTask" + task.hashCode()));
+        TasksRemoteViewsFactory.addView(task.hashCode(), newTask);
         updateWidget();
     }
 

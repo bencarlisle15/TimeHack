@@ -10,48 +10,34 @@ import java.util.Arrays;
 
 public class Returnable implements Serializable {
 
-    private static int RETURNABLE_ID;
-    private int id;
     private boolean[] days;
     private Event event;
 
     public Returnable(boolean[] days, Event event) {
         this.days = days;
         this.event = event;
-        this.id = RETURNABLE_ID++;
     }
 
 
-    public Returnable(int id, String bitfield, Event event) {
+    public Returnable(String bitfield, Event event) {
         boolean[] days = new boolean[bitfield.length()];
         for (int i = 0; i < bitfield.length(); i++) {
             days[i] = (bitfield.charAt(i) == '1');
         }
         this.days = days;
         this.event = event;
-        this.id = id;
     }
 
-    public Returnable(byte[] message, boolean needsId) {
-        if (needsId) {
-            this.id = RETURNABLE_ID++;
-        } else {
-            this.id = (int) Helper.readLongFromBytes(message, 4, 0);
-        }
-        String bitfield = Helper.readStringFromBytes(message, 11, 4);
+    public Returnable(byte[] message) {
+        String bitfield = Helper.readStringFromBytes(message, 11, 0);
         boolean[] days = new boolean[bitfield.length()];
         for (int i = 0; i < bitfield.length(); i++) {
             days[i] = (bitfield.charAt(i) == '1');
         }
         this.days = days;
-        byte[] eventArray = Arrays.copyOfRange(message, 11, message.length);
+        byte[] eventArray = Arrays.copyOfRange(message, 7, message.length);
         this.event = Helper.readEvent(eventArray);
     }
-
-    public static void setReturnableId(int returnableId) {
-        RETURNABLE_ID = returnableId;
-    }
-
     public String getBitfield() {
         StringBuilder ans = new StringBuilder();
         for (boolean day: days) {
@@ -64,17 +50,20 @@ public class Returnable implements Serializable {
         return event;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public int hashCode() {
-        return id;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Returnable)) {
+            return false;
+        }
+        Returnable returnable = (Returnable) o;
+        return Arrays.equals(days, returnable.days) && event.equals(returnable.event);
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
-        return (o instanceof Returnable) && o.hashCode() == hashCode();
+    public int hashCode() {
+        int result = Arrays.hashCode(days);
+        result = 31 * result + event.hashCode();
+        return result;
     }
 
     @NonNull
@@ -120,15 +109,14 @@ public class Returnable implements Serializable {
     @Override
     public byte[] serialize() {
         byte[] message = new byte[getSize()];
-        Helper.writeLongToBytes(message, id, 4, 0);
-        Helper.writeStringToBytes(message, getBitfield(), 4);
+        Helper.writeStringToBytes(message, getBitfield(), 0);
         byte[] eventArray = Helper.serializeEvent(event);
-        Helper.writeBytesToBytes(message, eventArray, 11);
+        Helper.writeBytesToBytes(message, eventArray, 7);
         return message;
     }
 
     @Override
     public int getSize() {
-        return 11 + Helper.getSize(event);
+        return 7 + Helper.getSize(event);
     }
 }

@@ -32,7 +32,7 @@ public class Helper {
             minuteString = String.valueOf(minute);
         }
 
-        String amString = (calendar.get(Calendar.AM_PM) == Calendar.AM) ? " AM" : "PM";
+        String amString = (calendar.get(Calendar.AM_PM) == Calendar.AM) ? "AM" : "PM";
         return hourString + ":" + minuteString + " " + amString;
     }
 
@@ -239,9 +239,9 @@ public class Helper {
     }
 
     public static boolean isEqualDates(EventDateTime dateTime1, EventDateTime dateTime2) {
-        long time1 = dateTime1.getDate().getValue();
-        long time2 = dateTime2.getDate().getValue();
-        return time1 == time2;
+        Calendar calendar1 = Helper.getCalendar(dateTime1);
+        Calendar calendar2 = Helper.getCalendar(dateTime2);
+        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) && calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR);
     }
 
     public static Event getFuture(Calendar startTime, Calendar endTime, String description, int taskId) {

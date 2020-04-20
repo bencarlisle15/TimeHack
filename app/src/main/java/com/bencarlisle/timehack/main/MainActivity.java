@@ -2,7 +2,6 @@ package com.bencarlisle.timehack.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -139,6 +138,7 @@ public class MainActivity extends GeneralActivity {
 				break;
 			case 4:
 				createFuture(startTime, endTime, description, dueDate);
+				break;
 			default:
 				Helper.makeToast(this, "An error occurred");
 		}
@@ -151,7 +151,6 @@ public class MainActivity extends GeneralActivity {
 		timesArray[0].set(Calendar.YEAR, dueDateDate.get(Calendar.YEAR));
 		timesArray[1].set(Calendar.DAY_OF_YEAR, dueDateDate.get(Calendar.DAY_OF_YEAR));
 		timesArray[1].set(Calendar.YEAR, dueDateDate.get(Calendar.YEAR));
-		Log.e("START", Helper.convertDateToString(dueDateDate) + " " + Helper.convertDateToString(timesArray[0]) + " " + Helper.convertDateToString(timesArray[1]));
 		String descriptionText = description.getText().toString();
 		Event future = Helper.getFuture(timesArray[0], timesArray[1], descriptionText, -1);
 		DataControl dataControl = new DataControl(this);
@@ -207,14 +206,12 @@ public class MainActivity extends GeneralActivity {
 
 		Matcher matcher = pattern.matcher(timeText);
 		Calendar calendar = Calendar.getInstance();
-
 		if(matcher.find() && matcher.groupCount() == 3) {
-			int hour = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
+			int hour = Integer.parseInt(Objects.requireNonNull(matcher.group(1))) % 12;
 			int minute = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
-			int amOrPm = Objects.equals(matcher.group(3), "A") ? Calendar.AM : Calendar.PM;
-			calendar.set(Calendar.HOUR, hour);
+			hour += Objects.equals(matcher.group(3), "AM") ? 0 : 12;
+			calendar.set(Calendar.HOUR_OF_DAY, hour);
 			calendar.set(Calendar.MINUTE, minute);
-			calendar.set(Calendar.AM_PM, amOrPm);
 		}
 		return calendar;
 	}
@@ -239,7 +236,6 @@ public class MainActivity extends GeneralActivity {
 			int month = Integer.parseInt(Objects.requireNonNull(matcher.group(1))) - 1;
 			int day = Integer.parseInt(Objects.requireNonNull(matcher.group(2)));
 			int year = Integer.parseInt(Objects.requireNonNull(matcher.group(3)));
-			Log.e("dasd", month + " " + day + " " + year);
 			calendar.set(Calendar.MONTH, month);
 			calendar.set(Calendar.DAY_OF_MONTH, day);
 			calendar.set(Calendar.YEAR, year);

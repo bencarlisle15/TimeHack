@@ -3,12 +3,11 @@ package com.bencarlisle.timelibrary.main;
 import androidx.annotation.NonNull;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class Task implements Comparable<Task>, Serializable {
 
-    private static int TASK_ID = 0;
-    private int id;
     private Calendar dueDate;
     private String description;
     private int priority;
@@ -21,11 +20,10 @@ public class Task implements Comparable<Task>, Serializable {
         this.priority = priority;
         this.hoursRequired = hoursRequired;
         this.hoursCompleted = hoursCompleted;
-        this.id = TASK_ID++;
     }
 
 
-    public Task(int id, long dueDateMillis, String description, int priority, float hoursRequired, float hoursCompleted) {
+    public Task(long dueDateMillis, String description, int priority, float hoursRequired, float hoursCompleted) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dueDateMillis);
         this.dueDate = calendar;
@@ -33,27 +31,17 @@ public class Task implements Comparable<Task>, Serializable {
         this.priority = priority;
         this.hoursRequired = hoursRequired;
         this.hoursCompleted = hoursCompleted;
-        this.id = id;
     }
 
-    public Task(byte[] message, boolean needsId) {
-        if (needsId) {
-            this.id = TASK_ID++;
-        } else {
-            this.id = (int) Helper.readLongFromBytes(message, 4, 0);
-        }
-        long dueDate = Helper.readLongFromBytes(message, 8, 4);
-        this.priority = (int) Helper.readLongFromBytes(message, 4, 12);
-        this.hoursRequired = Helper.readFloatFromBytes(message, 16);
-        this.hoursCompleted = Helper.readFloatFromBytes(message, 20);
-        this.description = Helper.readStringFromBytes(message, message.length, 24);
+    public Task(byte[] message) {
+        long dueDate = Helper.readLongFromBytes(message, 8, 0);
+        this.priority = (int) Helper.readLongFromBytes(message, 4, 8);
+        this.hoursRequired = Helper.readFloatFromBytes(message, 12);
+        this.hoursCompleted = Helper.readFloatFromBytes(message, 16);
+        this.description = Helper.readStringFromBytes(message, message.length, 20);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(dueDate);
         this.dueDate = calendar;
-    }
-
-    public static void setTaskId(int taskId) {
-        TASK_ID = taskId;
     }
 
     public int getDaysLeft() {
@@ -66,10 +54,6 @@ public class Task implements Comparable<Task>, Serializable {
         currentMidnight.set(Calendar.MINUTE, 0);
         long millisDifference = midnight.getTimeInMillis() - currentMidnight.getTimeInMillis();
         return (int) TimeUnit.MILLISECONDS.toDays(millisDifference);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public Calendar getDueDate() {
@@ -97,12 +81,21 @@ public class Task implements Comparable<Task>, Serializable {
         return description + " due at " + Helper.convertDateToString(dueDate) + " with priority " + priority;
     }
 
-    public int hashCode() {
-        return id;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Task)) {
+            return false;
+        }
+        Task task = (Task) o;
+        return task.dueDate.get(Calendar.YEAR) == dueDate.get(Calendar.YEAR) && task.dueDate.get(Calendar.DAY_OF_YEAR) == dueDate.get(Calendar.DAY_OF_YEAR) && task.getDescription().equals(description);
     }
 
-    public boolean equals(Object o) {
-        return o instanceof Task && o.hashCode() == hashCode();
+    @Override
+    public int hashCode() {
+        int hashCode = dueDate.get(Calendar.YEAR);
+        hashCode = 31 * hashCode + dueDate.get(Calendar.DAY_OF_YEAR);
+        hashCode = 31 * hashCode + description.hashCode();
+        return hashCode;
     }
 
     public int getHoursLeft() {
@@ -143,17 +136,16 @@ public class Task implements Comparable<Task>, Serializable {
     @Override
     public byte[] serialize() {
         byte[] message = new byte[getSize()];
-        Helper.writeLongToBytes(message, id, 4, 0);
-        Helper.writeLongToBytes(message, dueDate.getTimeInMillis(), 8, 4);
-        Helper.writeLongToBytes(message, priority, 4, 12);
-        Helper.writeFloatToBytes(message, hoursRequired, 16);
-        Helper.writeFloatToBytes(message, hoursCompleted, 20);
-        Helper.writeStringToBytes(message, description, 24);
+        Helper.writeLongToBytes(message, dueDate.getTimeInMillis(), 8, 0);
+        Helper.writeLongToBytes(message, priority, 4, 8);
+        Helper.writeFloatToBytes(message, hoursRequired, 12);
+        Helper.writeFloatToBytes(message, hoursCompleted, 16);
+        Helper.writeStringToBytes(message, description, 20);
         return message;
     }
 
     @Override
     public int getSize() {
-        return 24 + description.length();
+        return 20 + description.length();
     }
 }

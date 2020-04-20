@@ -28,8 +28,7 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         super(context, "Calendar.db", null, 1);
         this.context = context;
         db = this.getWritableDatabase();
-//        onUpgrade(db, 0,0);
-        setIds();
+//        reboot();
     }
 
     void setAuthState(String authState) {
@@ -38,11 +37,6 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         } else {
             db.execSQL("UPDATE AuthState SET authState='" + authState + "';");
         }
-    }
-
-    private void setIds() {
-        Returnable.setReturnableId(getNextReturnableId());
-        Task.setTaskId(getNextTaskId());
     }
 
 
@@ -78,18 +72,6 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         db.execSQL("CREATE TABLE Tasks (id INTEGER UNIQUE PRIMARY KEY NOT NULL, description TEXT NOT NULL, dueDate BIGINTEGER NOT NULL, priority INTEGER, hoursRequired FLOAT, hoursCompleted FLOAT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);");
         db.execSQL("CREATE TABLE Organized (lastDay INTEGER NOT NULL)");
         db.execSQL("INSERT INTO Organized (lastDay) VALUES (-1)");
-    }
-
-    private int getNextReturnableId() {
-        //sql injection is trivial
-        Cursor cursor = db.rawQuery(getSQL("getNextReturnableId", null), null);
-        return getNextId(cursor);
-    }
-
-    private int getNextTaskId() {
-        //sql injection is trivial
-        Cursor cursor = db.rawQuery(getSQL("getNextTaskId", null), null);
-        return getNextId(cursor);
     }
 
     public void addEvent(Event event) {
@@ -161,14 +143,13 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         ArrayList<Returnable> returnables = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String bitfield = cursor.getString(cursor.getColumnIndex("days"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
                 long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
                 int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
                 Event event = Helper.getEvent(Helper.initCalendar(startTime), Helper.initCalendar(endTime), description, taskId);
-                returnables.add(new Returnable(id, bitfield, event));
+                returnables.add(new Returnable(bitfield, event));
                 cursor.moveToNext();
             }
         }
@@ -197,14 +178,13 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         ArrayList<Returnable> returnables = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String bitfield = cursor.getString(cursor.getColumnIndex("days"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long startTime = cursor.getLong(cursor.getColumnIndex("startTime"));
                 long endTime = cursor.getLong(cursor.getColumnIndex("endTime"));
                 int taskId = cursor.getInt(cursor.getColumnIndex("taskId"));
                 Event event = Helper.getEvent(Helper.initCalendar(startTime), Helper.initCalendar(endTime), description, taskId);
-                returnables.add(new Returnable(id, bitfield, event));
+                returnables.add(new Returnable(bitfield, event));
                 cursor.moveToNext();
             }
         }
@@ -216,13 +196,12 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
         ArrayList<Task> tasks = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String description = cursor.getString(cursor.getColumnIndex("description"));
                 long dueDate = cursor.getLong(cursor.getColumnIndex("dueDate"));
                 float hoursRequired = cursor.getFloat(cursor.getColumnIndex("hoursRequired"));
                 float hoursCompleted = cursor.getFloat(cursor.getColumnIndex("hoursCompleted"));
                 int priority = cursor.getInt(cursor.getColumnIndex("priority"));
-                tasks.add(new Task(id, dueDate, description, priority, hoursRequired, hoursCompleted));
+                tasks.add(new Task(dueDate, description, priority, hoursRequired, hoursCompleted));
                 cursor.moveToNext();
             }
         }
@@ -249,10 +228,10 @@ public class DataControl extends SQLiteOpenHelper implements DataControllable {
                 return "SELECT id FROM Tasks ORDER BY id DESC;";
             case "addReturnable":
                 Returnable returnable = (Returnable) extra;
-                return "INSERT INTO Returnables (id, days, description, startTime, endTime, taskId) VALUES ('" + returnable.getId() + "', '" + returnable.getBitfield() + "', '" + returnable.getEvent().getSummary() + "', '" + returnable.getEvent().getStart().getDateTime().getValue() + "', '" + returnable.getEvent().getEnd().getDateTime().getValue() + "', '" + returnable.getEvent().getDescription() + "');";
+                return "INSERT INTO Returnables (id, days, description, startTime, endTime, taskId) VALUES ('" + returnable.hashCode() + "', '" + returnable.getBitfield() + "', '" + returnable.getEvent().getSummary() + "', '" + returnable.getEvent().getStart().getDateTime().getValue() + "', '" + returnable.getEvent().getEnd().getDateTime().getValue() + "', '" + returnable.getEvent().getDescription() + "');";
             case "addTask":
                 Task task = (Task) extra;
-                return "INSERT INTO Tasks (id, description, dueDate, priority, hoursRequired, hoursCompleted) VALUES ('" + task.getId() + "', '" + task.getDescription() + "', '" + task.getDueDate().getTimeInMillis() + "', '" + task.getPriority() + "', '" + task.getHoursRequired() + "', '" + task.getHoursCompleted() + "');";
+                return "INSERT INTO Tasks (id, description, dueDate, priority, hoursRequired, hoursCompleted) VALUES ('" + task.hashCode() + "', '" + task.getDescription() + "', '" + task.getDueDate().getTimeInMillis() + "', '" + task.getPriority() + "', '" + task.getHoursRequired() + "', '" + task.getHoursCompleted() + "');";
             case "removeReturnable":
                 Integer returnableId = (Integer) extra;
                 return "DELETE FROM Returnables WHERE id='" + returnableId + "';";

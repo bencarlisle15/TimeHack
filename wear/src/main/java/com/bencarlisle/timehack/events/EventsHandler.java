@@ -47,6 +47,7 @@ class EventsHandler implements Pollable {
     }
 
     public void poll() {
+        Log.e("EVENT", "Polling");
         synchronized (events) {
             ArrayList<Event> newEvents = dataControl.getEvents();
             if (newEvents == null) {
@@ -62,7 +63,7 @@ class EventsHandler implements Pollable {
             for (int i = 0; i < events.size(); i++) {
                 if (!newEvents.contains(events.get(i))) {
                     Log.e("REMOVING EVENT ", events.get(i).toString());
-                    deleteEvent(events.get(i).getId());
+                    deleteEvent(events.get(i).getId(), false);
                 }
             }
         }
@@ -104,7 +105,7 @@ class EventsHandler implements Pollable {
 
     void deleteEvent(View view) {
         int id = view.getId();
-        deleteEvent(String.valueOf(id));
+        deleteEvent(String.valueOf(id), true);
     }
 
     private void addEventToCalendar(Event event) {
@@ -133,12 +134,14 @@ class EventsHandler implements Pollable {
         addEventViewToCalendar(height, width, spacerHeight, newDescriptionTextSize, event);
     }
 
-    private void deleteEvent(String id) {
+    private void deleteEvent(String id, boolean deleteRemote) {
         activity.runOnUiThread(() -> {
             synchronized (events) {
                 for (int i = 0; i < events.size(); i++) {
                     if (events.get(i).getId().equals(id)) {
-                        dataControl.removeEvent(events.get(i));
+                        if (deleteRemote) {
+                            dataControl.removeEvent(events.get(i));
+                        }
                         adapter.removeView(i);
                         events.remove(i);
                         break;

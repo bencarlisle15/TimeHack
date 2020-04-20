@@ -1,6 +1,7 @@
 package com.bencarlisle.timehack.tasks;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,7 +32,7 @@ public class TasksHandler extends TasksModel {
             dataControl.removeTask(id);
             synchronized (tasks) {
                 for (int i = 0; i < tasks.size(); i++) {
-                    if (tasks.get(i).getId() == id) {
+                    if (tasks.get(i).hashCode() == id) {
                         viewAdapter.removeAt(i);
                         tasks.remove(i);
                         break;
@@ -51,7 +52,7 @@ public class TasksHandler extends TasksModel {
         ((TextView) taskView.findViewById(R.id.due_date)).setText(Helper.convertDateToString(task.getDueDate()));
         ((TextView) taskView.findViewById(R.id.hours_left)).setText(String.valueOf(task.getHoursLeft()));
         ((TextView) taskView.findViewById(R.id.task_priority)).setText(String.valueOf(task.getPriority()));
-        taskView.setId(task.getId());
+        taskView.setId(task.hashCode());
         viewAdapter.add(taskView);
     }
 }

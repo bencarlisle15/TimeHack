@@ -1,6 +1,7 @@
 package com.bencarlisle.timehack.returnables;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,7 +31,7 @@ public class ReturnablesHandler extends ReturnablesModel {
             dataControl.removeReturnable(id);
             synchronized (returnables) {
                 for (int i = 0; i < returnables.size(); i++) {
-                    if (returnables.get(i).getId() == id) {
+                    if (returnables.get(i).hashCode() == id) {
                         viewAdapter.removeAt(i);
                         returnables.remove(i);
                         break;
@@ -50,7 +51,7 @@ public class ReturnablesHandler extends ReturnablesModel {
         ((TextView) returnableView.findViewById(R.id.days)).setText(returnable.getDaysString());
         ((TextView) returnableView.findViewById(R.id.start_time)).setText(Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getStart())));
         ((TextView) returnableView.findViewById(R.id.end_time)).setText(Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getEnd())));
-        returnableView.setId(returnable.getId());
+        returnableView.setId(returnable.hashCode());
         viewAdapter.add(returnableView);
     }
 }

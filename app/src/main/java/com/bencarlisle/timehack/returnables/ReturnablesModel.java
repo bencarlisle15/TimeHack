@@ -41,8 +41,8 @@ abstract class ReturnablesModel implements Pollable {
             }
             for (int i = 0; i < returnables.size(); i++) {
                 if (!newReturnables.contains(returnables.get(i))) {
-                    Log.e("REMOVING TASK ", String.valueOf(returnables.get(i).getId()));
-                    deleteReturnable(returnables.get(i).getId());
+                    Log.e("REMOVING TASK ", String.valueOf(returnables.get(i).hashCode()));
+                    deleteReturnable(returnables.get(i).hashCode());
                 }
             }
         }

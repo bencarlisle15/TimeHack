@@ -17,7 +17,6 @@ import com.google.api.services.calendar.model.EventDateTime;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationService;
-import net.openid.appauth.TokenRequest;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,15 +100,19 @@ public class Organizer extends JobService {
         DataControl dataControl = new DataControl(context);
         AuthState authState = dataControl.getAuthState();
         if (authState.getNeedsTokenRefresh()) {
-            TokenRequest request = authState.createTokenRefreshRequest();
-            AuthorizationService authorizationService = new AuthorizationService(context);
-            authorizationService.performTokenRequest(request, (response, error) -> {
-                authorizationService.dispose();
-                authState.update(response, error);
-                runTaskAdderWithTokens(dataControl, context);
+            AuthorizationService authService = new AuthorizationService(context);
+            authService.performTokenRequest(authState.createTokenRefreshRequest(), (resp, err) -> {
+                if (resp != null) {
+                    authState.update(resp, err);
+                    dataControl.setAuthState(authState.jsonSerializeString());
+                    new Thread(() -> runTaskAdderWithTokens(dataControl, context)).start();
+                } else {
+                    Log.e("Organizer", "Failed");
+                }
             });
+            authService.dispose();
         } else {
-            runTaskAdderWithTokens(dataControl, context);
+            new Thread(() -> runTaskAdderWithTokens(dataControl, context)).start();
         }
     }
 
@@ -120,11 +123,12 @@ public class Organizer extends JobService {
         }
         dataControl.cleanTasks();
 //        dataControl.clearEvents();
-        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
         ArrayList<Returnable> returnables = dataControl.getReturnablesOnDay(day);
         TreeSet<Event> events = new TreeSet<>((e1, e2) -> (int) (e1.getStart().getDateTime().getValue() - e2.getStart().getDateTime().getValue()));
 
         for (Returnable returnable: returnables) {
+            Log.e("Ret", Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getStart())) + ":" + Helper.convertTimeToString(Helper.getCalendar(returnable.getEvent().getEnd())));
             dataControl.addEvent(returnable.getEvent());
             events.add(returnable.getEvent());
         }
@@ -157,6 +161,10 @@ public class Organizer extends JobService {
 //            } else {
 //                unAddedTasks.add(task);
             }
+        }
+        Log.e("PRINTING", "EVENTS");
+        for (Event event: events) {
+            Log.e("Event", event.toString());
         }
         dataControl.runOrganizer();
         dataControl.close();
@@ -205,7 +213,7 @@ public class Organizer extends JobService {
         end.set(Calendar.MINUTE, start.get(Calendar.MINUTE));
         end.add(Calendar.HOUR_OF_DAY, (int) nextHours);
         end.add(Calendar.MINUTE, (int) Math.ceil(60 * (nextHours % 1)));
-        return Helper.getEvent(start, end, task.getDescription(), task.getId());
+        return Helper.getEvent(start, end, task.getDescription(), task.hashCode());
     }
 
     private static float getHoursBetween(Calendar start, Calendar end) {
@@ -243,7 +251,7 @@ public class Organizer extends JobService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         onTaskRemoved(intent);
-        Log.e("ON", "Stat4edD");
+        Log.e("ON", "Started");
         return START_STICKY;
     }
 
@@ -257,7 +265,6 @@ public class Organizer extends JobService {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.e("TASK", "REMOVED");
         super.onTaskRemoved(rootIntent);
     }
 }

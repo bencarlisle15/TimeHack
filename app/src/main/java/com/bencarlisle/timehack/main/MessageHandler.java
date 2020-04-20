@@ -57,11 +57,11 @@ public class MessageHandler extends WearableListenerService {
                 break;
             case "addReturnable":
                 byte[] returnable = dataMap.getByteArray("data");
-                dataControl.addReturnable(new Returnable(returnable, true));
+                dataControl.addReturnable(new Returnable(returnable));
                 break;
             case "addTask":
                 byte[] task = dataMap.getByteArray("data");
-                dataControl.addTask(new Task(task, true));
+                dataControl.addTask(new Task(task));
                 break;
             case "removeEvent":
                 byte[] deletedEvent = dataMap.getByteArray("data");
@@ -71,5 +71,6 @@ public class MessageHandler extends WearableListenerService {
                 Log.e("App", "Command: '" + data + "' not found");
                 break;
         }
+        dataControl.close();
     }
 }
